@@ -4,7 +4,7 @@
 #include "MainGame.h"
 #include "MapReader.h"
 
-#define MAP_PATH "C:\\Users\\jules\\source\\repos\\RPG\\x64\\Debug\\map.txt"
+#define MAP_PATH "C:\\Users\\jules\\source\\repos\\RPG\\x64\\Debug\\assets\\Maps\\debug.txt"
 
 void draw_chunk(sf::RenderWindow& window, Chunk* activeChunk)
 {
@@ -46,6 +46,8 @@ void MainGame::Run()
     int current = time(0);
     int frames = 0;
 
+    sf::Vector2f m_pos = sf::Vector2f(50,50);
+
     while (window.isOpen())
     {
         deltatime = clock.restart().asSeconds();
@@ -69,24 +71,26 @@ void MainGame::Run()
             {
                 window.close();
             }
-
-            if (event.type == sf::Event::Resized)
-            {
-                /*float h = event.size.height;
-                float w = event.size.width;
-
-                view.setSize(w, h);
-                window.setSize(sf::Vector2u(w, h));
-                view.setCenter(w / 2, h / 2);
-                window.setView(view);
-                */
-            }
         }
        
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
         {
             HasUpdate = true;
         }
+
+
+
+        sf::Vector2f last_m_pos = m_pos;
+        m_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        m_pos = sf::Vector2f(((int)(m_pos.x / 50) * 50), ((int)(m_pos.y / 50) * 50));
+        if (last_m_pos.x != m_pos.x || last_m_pos.y != m_pos.y)
+        {
+            HasUpdate = true;
+        }
+
+       
+
+        
 
         if (HasUpdate)
         {
@@ -105,6 +109,14 @@ void MainGame::Run()
                     window.draw(activeChunk->chunk[i + j]->Draw(sf::Vector2f(j * 50, i * 5)));
                 }
             }
+
+            sf::RectangleShape rect;
+            rect.setFillColor(sf::Color::Color(0, 0, 0, 0));
+            rect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
+            rect.setOutlineThickness(1.0f);
+            rect.setPosition(m_pos);
+            rect.setSize(sf::Vector2f(50, 50));
+            window.draw(rect);
 
             window.display();
         }
