@@ -4,8 +4,8 @@
 #include <cmath>
 #include "MainGame.h"
 #include "MapReader.h"
+#include "Consts.h"
 
-#define MAP_PATH "C:\\Users\\jules\\source\\repos\\RPG\\x64\\Debug\\assets\\Maps\\debug.txt"
 
 void draw_chunk(sf::RenderWindow& window, Chunk* activeChunk)
 {
@@ -14,7 +14,11 @@ void draw_chunk(sf::RenderWindow& window, Chunk* activeChunk)
 
 MainGame::MainGame()
 {
-   
+    sf::Font font;
+    if (font.loadFromFile(FONT_PATH))
+    {
+        this->isFontReady = true;
+    }
 }
 
 MainGame::~MainGame()
@@ -34,16 +38,23 @@ void MainGame::Run()
     
     sf::Clock clock;
     float deltatime = 0;
-    this->playerPos = sf::Vector2f(4, 4);
+    this->player.playerPos = sf::Vector2f(4, 4);
     
     MapReader reader = MapReader();
     Chunk* activeChunk = new Chunk();
+    
     activeChunk->position = sf::Vector2f(0, 0);
     activeChunk->chunk = reader.getMapChunk(MAP_PATH, activeChunk->position);
-    
+    this->player.addVisitedChunk(activeChunk->position);
+
     bool mouseUpdate = true;
     bool keyboardUpdate = true;
+
     bool chunkChange = false;
+    bool endAnimation = false;
+    const float chunkAnimationDuration = 20.0f;
+    float chunkChangeAnimation = chunkAnimationDuration;
+   
     
     time_t start = time(0);
     time_t current = time(0);
@@ -55,17 +66,14 @@ void MainGame::Run()
     {
         deltatime = clock.restart().asSeconds();
 
-
         frames++;
         current = time(0);
         if (current - start >= (time_t)1)
         {
-            window.setTitle(std::to_string(frames) + " (" + std::to_string((int)activeChunk->position.x) +";" + std::to_string((int)activeChunk->position.y)+")");
+            window.setTitle(std::to_string(frames) + " (" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")");
             frames = 0;
             start = time(0);
         }
-
-
 
         sf::Event event;
         while (window.pollEvent(event))
@@ -76,114 +84,10 @@ void MainGame::Run()
             }
         }
 
-
-        int playerSeep = 10;
-        
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-        {
-            playerSeep = 2;
-        }else
-        {
-            playerSeep = 10;
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            this->playerPos.y -= playerSeep * deltatime;
-            keyboardUpdate = true;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            this->playerPos.y += playerSeep * deltatime;
-            keyboardUpdate = true;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            this->playerPos.x -= playerSeep * deltatime;
-            keyboardUpdate = true;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            this->playerPos.x += playerSeep * deltatime;
-            keyboardUpdate = true;
-        }
-
+        keyboardUpdate = this->player.KeyBoardUpdate(deltatime);
         if (keyboardUpdate)
         {
-            sf::Vector2f roundPlayer = sf::Vector2f((this->playerPos.x * 50/50),(this->playerPos.y*50/50));
-            sf::Vector2f next;
-
-            if (roundPlayer.x > 9)
-            {
-                next = activeChunk->position;
-                next.x++;
-                std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
-                if (c.size() > 0)
-                {
-                    this->playerPos.x = 0;
-                    this->playerPos.x += playerSeep * deltatime;
-                    activeChunk->chunk = c;
-                    activeChunk->position = next;
-                    chunkChange = true;
-                }else
-                {
-                    this->playerPos.x -= playerSeep * deltatime;
-                }
-            }
-            else if (roundPlayer.x < 0)
-            {
-                next = activeChunk->position;
-                next.x--;
-                std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
-                if (c.size() > 0)
-                {
-                    this->playerPos.x = 9;
-                    this->playerPos.x -= playerSeep * deltatime;
-                    activeChunk->chunk = c;
-                    activeChunk->position = next;
-                    chunkChange = true;
-                }else
-                {
-                    this->playerPos.x += playerSeep * deltatime;
-                }
-            }
-
-            if (roundPlayer.y > 9)
-            {
-                next = activeChunk->position;
-                next.y++;
-                std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
-                if (c.size() > 0)
-                {
-                    this->playerPos.y = 0;
-                    this->playerPos.y += playerSeep * deltatime;
-                    activeChunk->chunk = c;
-                    activeChunk->position = next;
-                    chunkChange = true;
-                }
-                else
-                {
-                    this->playerPos.y -= playerSeep * deltatime;
-                }
-            }
-            else if (roundPlayer.y < 0)
-            {
-                next = activeChunk->position;
-                next.y--;
-                std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
-                if (c.size() > 0)
-                {
-                    this->playerPos.y = 9;
-                    this->playerPos.y -= playerSeep * deltatime;
-                    activeChunk->chunk = c;
-                    activeChunk->position = next;
-                    chunkChange = true;
-                }
-                else
-                {
-                    this->playerPos.y += playerSeep * deltatime;
-                }
-            }
+            chunkChange = this->player.MapUpdate(deltatime, reader, activeChunk);
         }
 
         sf::Vector2f last_m_pos = m_pos;
@@ -193,43 +97,121 @@ void MainGame::Run()
         {
             mouseUpdate = true;
         }
-
-
-        if (keyboardUpdate || mouseUpdate)
+        
+        if (chunkChange || chunkChangeAnimation < chunkAnimationDuration)
         {
-            keyboardUpdate = false;
-            mouseUpdate = false;
-
-            for (int i = 0; i < activeChunk->chunk.size(); i++)
+            if (chunkChange)
             {
-                activeChunk->chunk[i]->Update(deltatime);
-            }
-
-            window.clear();
-
-            for (int i = 0; i < 100; i += 10)
-            {
-                for (int j = 0; j < 10; j++)
+                if (this->player.isNewChunk())
                 {
-                    window.draw(activeChunk->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
+                    chunkChangeAnimation = 0.0f;
+                    endAnimation = false;
+                }
+
+                chunkChange = false;
+            }
+            else
+            {
+                chunkChangeAnimation += deltatime * 10;
+                if (chunkChangeAnimation > chunkAnimationDuration)
+                {
+                    endAnimation = true;
                 }
             }
 
-            sf::CircleShape circ;
-            circ.setFillColor(sf::Color::Black);
-            circ.setRadius(25.0f);
-            circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
-            window.draw(circ);
+            if (!endAnimation)
+            {
+               
+                window.clear();
 
-            sf::RectangleShape rect;
-            rect.setFillColor(sf::Color::Color(0, 0, 0, 0));
-            rect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
-            rect.setOutlineThickness(1.0f);
-            rect.setPosition(m_pos);
-            rect.setSize(sf::Vector2f(50, 50));
-            window.draw(rect);
+                for (int i = 0; i < activeChunk->chunk.size(); i++)
+                {
+                    activeChunk->chunk[i]->Update(deltatime);
+                }
+                for (int i = 0; i < 100; i += 10)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        window.draw(activeChunk->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
+                    }
+                }
 
-            window.display();
+                sf::CircleShape circ;
+                circ.setFillColor(sf::Color::Black);
+                circ.setRadius(25.0f);
+                circ.setPosition(sf::Vector2f(this->player.playerPos.x * 50, this->player.playerPos.y * 50));
+                window.draw(circ);
+
+                sf::RectangleShape mouseRect;
+                mouseRect.setFillColor(sf::Color::Color(0, 0, 0, 0));
+                mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
+                mouseRect.setOutlineThickness(1.0f);
+                mouseRect.setPosition(m_pos);
+                mouseRect.setSize(sf::Vector2f(50, 50));
+                window.draw(mouseRect);
+
+                sf::RectangleShape blur;
+                int gradien = 255 - (int)((255 * chunkChangeAnimation * (100/ chunkAnimationDuration)) / 100);
+                blur.setFillColor(sf::Color(0, 0, 0, gradien));
+                blur.setPosition(sf::Vector2f(0, 0));
+                blur.setSize(sf::Vector2f(window.getSize()));
+                window.draw(blur);
+
+                window.display();
+            }
+        }
+        else
+        {
+            if (keyboardUpdate || mouseUpdate || endAnimation)
+            {
+                endAnimation = false;
+                keyboardUpdate = false;
+                mouseUpdate = false;
+
+
+                for (int i = 0; i < activeChunk->chunk.size(); i++)
+                {
+                    activeChunk->chunk[i]->Update(deltatime);
+                }
+
+                window.clear();
+
+                for (int i = 0; i < 100; i += 10)
+                {
+                    for (int j = 0; j < 10; j++)
+                    {
+                        window.draw(activeChunk->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
+                    }
+                }
+
+                sf::CircleShape circ;
+                circ.setFillColor(sf::Color::Black);
+                circ.setRadius(25.0f);
+                circ.setPosition(sf::Vector2f(this->player.playerPos.x * 50, this->player.playerPos.y * 50));
+                window.draw(circ);
+
+                sf::RectangleShape mouseRect;
+                mouseRect.setFillColor(sf::Color::Color(0, 0, 0, 0));
+                mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
+                mouseRect.setOutlineThickness(1.0f);
+                mouseRect.setPosition(m_pos);
+                mouseRect.setSize(sf::Vector2f(50, 50));
+                window.draw(mouseRect);
+
+
+                /*if (this->isFontReady)
+                {
+                    sf::Text location;
+                    location.setFont(this->font);
+
+                    location.setString();
+                    location.setPosition(sf::Vector2f(10, 10));
+
+                    window.draw(location);
+                }*/
+
+                window.display();
+            }
         }
     }
 }

@@ -144,12 +144,15 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="MapReader.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Case.h" />
     <ClInclude Include="Chunk.h" />
+    <ClInclude Include="Consts.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="MapReader.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

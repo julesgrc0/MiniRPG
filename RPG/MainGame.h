@@ -1,6 +1,6 @@
 #pragma once
 #include"Chunk.h"
-
+#include "Player.h"
 
 class MainGame
 {
@@ -10,6 +10,8 @@ public:
 	bool Init(const char*);
 	void Run();
 private:
-	sf::Vector2f playerPos;
+	Player player;
+	sf::Font font;
+	bool isFontReady = false;
 };
 
