@@ -1,6 +1,6 @@
 #include<SFML/Graphics.hpp>
 #include "Case.h"
-
+#include<iostream>
 
 Case::Case()
 {
@@ -11,9 +11,12 @@ Case::~Case()
 {
 }
 
-void Case::Update(float time)
+void Case::Update(float deltatime)
 {
+}
 
+sf::Sprite Case::Draw(sf::Vector2f pos)
+{
 	switch (this->type)
 	{
 	case GRASS:
@@ -29,10 +32,6 @@ void Case::Update(float time)
 		this->texture.clear();
 		break;
 	}
-}
-
-sf::Sprite Case::Draw(sf::Vector2f pos)
-{
 	sf::Sprite sprite(texture.getTexture());
 	sprite.setPosition(pos);
 	return sprite;

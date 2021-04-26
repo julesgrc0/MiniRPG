@@ -20,5 +20,6 @@ public:
 	sf::Sprite Draw(sf::Vector2f);
 private:
 	sf::RenderTexture texture;
+	float time = 0.0f;
 };
 

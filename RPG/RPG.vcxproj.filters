@@ -33,6 +33,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainGame.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Consts.h">
       <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

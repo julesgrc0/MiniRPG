@@ -1,6 +1,7 @@
 #pragma once
 #include"Chunk.h"
 #include "Player.h"
+#include "Mouse.h"
 
 class MainGame
 {
@@ -11,6 +12,7 @@ public:
 	void Run();
 private:
 	Player player;
+	Mouse mouse;
 	sf::Font font;
 	bool isFontReady = false;
 };

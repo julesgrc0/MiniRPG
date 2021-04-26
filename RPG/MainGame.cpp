@@ -1,6 +1,5 @@
 #include<SFML/Graphics.hpp>
 #include<iostream>
-#include<thread>
 #include <cmath>
 #include "MainGame.h"
 #include "MapReader.h"
@@ -60,7 +59,7 @@ void MainGame::Run()
     time_t current = time(0);
     int frames = 0;
 
-    sf::Vector2f m_pos = sf::Vector2f(50,50);
+
 
     while (window.isOpen())
     {
@@ -90,14 +89,13 @@ void MainGame::Run()
             chunkChange = this->player.MapUpdate(deltatime, reader, activeChunk);
         }
 
-        sf::Vector2f last_m_pos = m_pos;
-        m_pos = sf::Vector2f(sf::Mouse::getPosition(window));
-        m_pos = sf::Vector2f((int)m_pos.x / 50 * 50, (int)m_pos.y / 50 * 50);
-        if (last_m_pos.x != m_pos.x || last_m_pos.y != m_pos.y)
-        {
-            mouseUpdate = true;
-        }
+        mouseUpdate =  this->mouse.Update(window);
         
+        for (int i = 0; i < activeChunk->chunk.size(); i++)
+        {
+            activeChunk->chunk[i]->Update(deltatime);
+        }
+
         if (chunkChange || chunkChangeAnimation < chunkAnimationDuration)
         {
             if (chunkChange)
@@ -124,31 +122,9 @@ void MainGame::Run()
                
                 window.clear();
 
-                for (int i = 0; i < activeChunk->chunk.size(); i++)
-                {
-                    activeChunk->chunk[i]->Update(deltatime);
-                }
-                for (int i = 0; i < 100; i += 10)
-                {
-                    for (int j = 0; j < 10; j++)
-                    {
-                        window.draw(activeChunk->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
-                    }
-                }
-
-                sf::CircleShape circ;
-                circ.setFillColor(sf::Color::Black);
-                circ.setRadius(25.0f);
-                circ.setPosition(sf::Vector2f(this->player.playerPos.x * 50, this->player.playerPos.y * 50));
-                window.draw(circ);
-
-                sf::RectangleShape mouseRect;
-                mouseRect.setFillColor(sf::Color::Color(0, 0, 0, 0));
-                mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
-                mouseRect.setOutlineThickness(1.0f);
-                mouseRect.setPosition(m_pos);
-                mouseRect.setSize(sf::Vector2f(50, 50));
-                window.draw(mouseRect);
+                activeChunk->Draw(window);
+                this->player.Draw(window);
+                this->mouse.Draw(window);
 
                 sf::RectangleShape blur;
                 int gradien = 255 - (int)((255 * chunkChangeAnimation * (100/ chunkAnimationDuration)) / 100);
@@ -168,47 +144,11 @@ void MainGame::Run()
                 keyboardUpdate = false;
                 mouseUpdate = false;
 
-
-                for (int i = 0; i < activeChunk->chunk.size(); i++)
-                {
-                    activeChunk->chunk[i]->Update(deltatime);
-                }
-
                 window.clear();
 
-                for (int i = 0; i < 100; i += 10)
-                {
-                    for (int j = 0; j < 10; j++)
-                    {
-                        window.draw(activeChunk->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
-                    }
-                }
-
-                sf::CircleShape circ;
-                circ.setFillColor(sf::Color::Black);
-                circ.setRadius(25.0f);
-                circ.setPosition(sf::Vector2f(this->player.playerPos.x * 50, this->player.playerPos.y * 50));
-                window.draw(circ);
-
-                sf::RectangleShape mouseRect;
-                mouseRect.setFillColor(sf::Color::Color(0, 0, 0, 0));
-                mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
-                mouseRect.setOutlineThickness(1.0f);
-                mouseRect.setPosition(m_pos);
-                mouseRect.setSize(sf::Vector2f(50, 50));
-                window.draw(mouseRect);
-
-
-                /*if (this->isFontReady)
-                {
-                    sf::Text location;
-                    location.setFont(this->font);
-
-                    location.setString();
-                    location.setPosition(sf::Vector2f(10, 10));
-
-                    window.draw(location);
-                }*/
+                activeChunk->Draw(window);
+                this->player.Draw(window);
+                this->mouse.Draw(window);
 
                 window.display();
             }

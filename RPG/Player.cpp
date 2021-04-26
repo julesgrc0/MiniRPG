@@ -5,6 +5,14 @@ Player::Player()
 {
 
 }
+void Player::Draw(sf::RenderWindow& window)
+{
+    sf::CircleShape circ;
+    circ.setFillColor(sf::Color::Black);
+    circ.setRadius(25.0f);
+    circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
+    window.draw(circ);
+}
 
 void Player::addVisitedChunk(sf::Vector2f chunk)
 {
@@ -24,7 +32,7 @@ bool Player::KeyBoardUpdate(float deltatime)
     }
     else
     {
-        playerSeep = 10;
+        this->playerSeep = this->Max_player_speed;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
