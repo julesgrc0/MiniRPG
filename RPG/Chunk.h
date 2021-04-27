@@ -9,6 +9,7 @@ public:
 	~Chunk();
 	std::vector<Case *> chunk;
 	sf::Vector2f position;
+	int  size = 50;
 	void Draw(sf::RenderWindow &);
 	void Draw(sf::RenderTexture &);
 };

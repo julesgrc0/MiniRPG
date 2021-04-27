@@ -10,7 +10,7 @@ public:
 
 	std::vector<Chunk *> getFullMap(const char *);
 	std::vector<Case *> getMapChunk(const char *, sf::Vector2f);
-
+	int size = 50;
 private:
 	std::vector<Chunk *> map_chunks;
 };

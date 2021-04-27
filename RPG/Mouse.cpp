@@ -27,7 +27,7 @@ void Mouse::Draw(sf::RenderWindow &window)
     mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
     mouseRect.setOutlineThickness(1.0f);
     mouseRect.setPosition(this->m_pos);
-    mouseRect.setSize(sf::Vector2f(50, 50));
+    mouseRect.setSize(sf::Vector2f(this->size, this->size));
 
     window.draw(mouseRect);
 }
@@ -39,7 +39,7 @@ void Mouse::Draw(sf::RenderTexture &texture)
     mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
     mouseRect.setOutlineThickness(1.0f);
     mouseRect.setPosition(this->m_pos);
-    mouseRect.setSize(sf::Vector2f(50, 50));
+    mouseRect.setSize(sf::Vector2f(this->size, this->size));
 
     texture.draw(mouseRect);
 }

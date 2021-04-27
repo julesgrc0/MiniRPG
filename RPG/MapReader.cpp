@@ -26,7 +26,7 @@ std::vector<Chunk *> MapReader::getFullMap(const char *filepath)
 
                 for (int i = 2; i < 102; i++)
                 {
-                    Case *item = new Case();
+                    Case *item = new Case(this->size);
                     CaseTypes type;
                     switch (std::atoi(numbers[i].c_str()))
                     {
@@ -75,7 +75,7 @@ std::vector<Case *> MapReader::getMapChunk(const char *filepath, sf::Vector2f po
                 {
                     for (int i = 2; i < 102; i++)
                     {
-                        Case *item = new Case();
+                        Case *item = new Case(this->size);
                         CaseTypes type;
                         switch (std::atoi(numbers[i].c_str()))
                         {

@@ -10,7 +10,7 @@ void Chunk::Draw(sf::RenderWindow &window)
     {
         for (int j = 0; j < 10; j++)
         {
-            window.draw(this->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
+            window.draw(this->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * this->size, i * this->size/10)));
         }
     }
 }
@@ -21,7 +21,7 @@ void Chunk::Draw(sf::RenderTexture &texture)
     {
         for (int j = 0; j < 10; j++)
         {
-            texture.draw(this->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * 50, i * 5)));
+            texture.draw(this->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * this->size, i * this->size / 10)));
         }
     }
 }

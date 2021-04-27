@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "MainGame.h"
 
+
 int main(int argc, const char *argv[])
 {
 	MainGame mainGame = MainGame();

@@ -2,9 +2,9 @@
 #include "Case.h"
 #include <iostream>
 
-Case::Case()
+Case::Case(int size)
 {
-	this->texture.create(50, 50);
+	this->texture.create(size,size);
 }
 
 Case::~Case()
