@@ -1,11 +1,11 @@
-#include<iostream>
-#include<SFML/Graphics.hpp>
-#include"MainGame.h"
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include "MainGame.h"
 
-int main(int argc, const char* argv[])
+int main(int argc, const char *argv[])
 {
 	MainGame mainGame = MainGame();
-	
+
 	if (!mainGame.Init(argv[0]))
 	{
 		return 1;

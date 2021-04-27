@@ -1,6 +1,6 @@
-#include<SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include "Case.h"
-#include<iostream>
+#include <iostream>
 
 Case::Case()
 {

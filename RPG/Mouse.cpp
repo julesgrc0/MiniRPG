@@ -1,12 +1,10 @@
 #include "Mouse.h"
 
-
 Mouse::Mouse()
 {
-
 }
 
-bool Mouse::Update(sf::RenderWindow& window)
+bool Mouse::Update(sf::RenderWindow &window)
 {
     bool mouseUpdate = false;
 
@@ -22,7 +20,7 @@ bool Mouse::Update(sf::RenderWindow& window)
     return mouseUpdate;
 }
 
-void Mouse::Draw(sf::RenderWindow& window)
+void Mouse::Draw(sf::RenderWindow &window)
 {
     sf::RectangleShape mouseRect;
     mouseRect.setFillColor(sf::Color::Color(0, 0, 0, 0));
@@ -34,7 +32,18 @@ void Mouse::Draw(sf::RenderWindow& window)
     window.draw(mouseRect);
 }
 
+void Mouse::Draw(sf::RenderTexture &texture)
+{
+    sf::RectangleShape mouseRect;
+    mouseRect.setFillColor(sf::Color::Color(0, 0, 0, 0));
+    mouseRect.setOutlineColor(sf::Color::Color(0, 0, 0, 255));
+    mouseRect.setOutlineThickness(1.0f);
+    mouseRect.setPosition(this->m_pos);
+    mouseRect.setSize(sf::Vector2f(50, 50));
+
+    texture.draw(mouseRect);
+}
+
 Mouse::~Mouse()
 {
-
 }

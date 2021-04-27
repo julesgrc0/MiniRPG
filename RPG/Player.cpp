@@ -3,15 +3,23 @@
 
 Player::Player()
 {
-
 }
-void Player::Draw(sf::RenderWindow& window)
+void Player::Draw(sf::RenderWindow &window)
 {
     sf::CircleShape circ;
     circ.setFillColor(sf::Color::Black);
     circ.setRadius(25.0f);
     circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
     window.draw(circ);
+}
+
+void Player::Draw(sf::RenderTexture &texture)
+{
+    sf::CircleShape circ;
+    circ.setFillColor(sf::Color::Black);
+    circ.setRadius(25.0f);
+    circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
+    texture.draw(circ);
 }
 
 void Player::addVisitedChunk(sf::Vector2f chunk)
@@ -65,13 +73,14 @@ bool Player::isNewChunk()
     {
         this->isNew = false;
         return true;
-    }else
+    }
+    else
     {
         return false;
     }
 }
 
-bool Player::MapUpdate(float deltatime,MapReader& reader, Chunk*& activeChunk)
+bool Player::MapUpdate(float deltatime, MapReader &reader, Chunk *&activeChunk)
 {
     this->isNew = false;
     bool chunkChange = false;
@@ -83,7 +92,7 @@ bool Player::MapUpdate(float deltatime,MapReader& reader, Chunk*& activeChunk)
     {
         next = activeChunk->position;
         next.x++;
-        std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
+        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
         if (c.size() > 0)
         {
             this->playerPos.x -= 9.5;
@@ -102,7 +111,7 @@ bool Player::MapUpdate(float deltatime,MapReader& reader, Chunk*& activeChunk)
     {
         next = activeChunk->position;
         next.x--;
-        std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
+        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
         if (c.size() > 0)
         {
             this->playerPos.x += 9.5;
@@ -121,7 +130,7 @@ bool Player::MapUpdate(float deltatime,MapReader& reader, Chunk*& activeChunk)
     {
         next = activeChunk->position;
         next.y++;
-        std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
+        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
         if (c.size() > 0)
         {
             this->playerPos.y -= 9.5;
@@ -140,7 +149,7 @@ bool Player::MapUpdate(float deltatime,MapReader& reader, Chunk*& activeChunk)
     {
         next = activeChunk->position;
         next.y--;
-        std::vector<Case*> c = reader.getMapChunk(MAP_PATH, next);
+        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
         if (c.size() > 0)
         {
             this->playerPos.y += 9.5;
@@ -170,5 +179,4 @@ bool Player::MapUpdate(float deltatime,MapReader& reader, Chunk*& activeChunk)
 
 Player::~Player()
 {
-
 }

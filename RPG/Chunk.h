@@ -7,8 +7,8 @@ class Chunk
 public:
 	Chunk();
 	~Chunk();
-	std::vector<Case*> chunk;
+	std::vector<Case *> chunk;
 	sf::Vector2f position;
-	void Draw(sf::RenderWindow&);
+	void Draw(sf::RenderWindow &);
+	void Draw(sf::RenderTexture &);
 };
-

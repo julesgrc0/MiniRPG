@@ -1,47 +1,41 @@
-#include<SFML/Graphics.hpp>
-#include<iostream>
+#include <SFML/Graphics.hpp>
+#include <iostream>
 #include <cmath>
+
 #include "MainGame.h"
 #include "MapReader.h"
 #include "Consts.h"
 
-
-void draw_chunk(sf::RenderWindow& window, Chunk* activeChunk)
-{
-    
-}
-
 MainGame::MainGame()
 {
-    sf::Font font;
-    if (font.loadFromFile(FONT_PATH))
-    {
-        this->isFontReady = true;
-    }
 }
 
 MainGame::~MainGame()
 {
-
 }
 
-bool MainGame::Init(const char* path)
+bool MainGame::Init(const char *path)
 {
-	return true;
+    return true;
 }
 
 void MainGame::Run()
 {
-    sf::RenderWindow window(sf::VideoMode(500, 500), "",sf::Style::Close);
-    sf::View view = window.getDefaultView();
-    
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "", sf::Style::Close);
+    //sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "",sf::Style::Fullscreen | sf::Style::Close);
+
+    window.setVerticalSyncEnabled(false);
+    window.setFramerateLimit(0);
+
+    //window.setMouseCursorVisible(false);
+
     sf::Clock clock;
     float deltatime = 0;
     this->player.playerPos = sf::Vector2f(4, 4);
-    
+
     MapReader reader = MapReader();
-    Chunk* activeChunk = new Chunk();
-    
+    Chunk *activeChunk = new Chunk();
+
     activeChunk->position = sf::Vector2f(0, 0);
     activeChunk->chunk = reader.getMapChunk(MAP_PATH, activeChunk->position);
     this->player.addVisitedChunk(activeChunk->position);
@@ -53,13 +47,13 @@ void MainGame::Run()
     bool endAnimation = false;
     const float chunkAnimationDuration = 20.0f;
     float chunkChangeAnimation = chunkAnimationDuration;
-   
-    
+
     time_t start = time(0);
     time_t current = time(0);
     int frames = 0;
 
-
+    sf::RenderTexture gameTexture;
+    gameTexture.create(500, 500);
 
     while (window.isOpen())
     {
@@ -81,6 +75,11 @@ void MainGame::Run()
             {
                 window.close();
             }
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            {
+                window.close();
+            }
         }
 
         keyboardUpdate = this->player.KeyBoardUpdate(deltatime);
@@ -89,8 +88,8 @@ void MainGame::Run()
             chunkChange = this->player.MapUpdate(deltatime, reader, activeChunk);
         }
 
-        mouseUpdate =  this->mouse.Update(window);
-        
+        mouseUpdate = this->mouse.Update(window);
+
         for (int i = 0; i < activeChunk->chunk.size(); i++)
         {
             activeChunk->chunk[i]->Update(deltatime);
@@ -119,20 +118,25 @@ void MainGame::Run()
 
             if (!endAnimation)
             {
-               
-                window.clear();
 
-                activeChunk->Draw(window);
-                this->player.Draw(window);
-                this->mouse.Draw(window);
+                gameTexture.clear();
 
+                activeChunk->Draw(gameTexture);
+                this->player.Draw(gameTexture);
+                this->mouse.Draw(gameTexture);
                 sf::RectangleShape blur;
-                int gradien = 255 - (int)((255 * chunkChangeAnimation * (100/ chunkAnimationDuration)) / 100);
+                int gradien = 255 - (int)((255 * chunkChangeAnimation * (100 / chunkAnimationDuration)) / 100);
                 blur.setFillColor(sf::Color(0, 0, 0, gradien));
                 blur.setPosition(sf::Vector2f(0, 0));
                 blur.setSize(sf::Vector2f(window.getSize()));
-                window.draw(blur);
+                gameTexture.draw(blur);
 
+                gameTexture.display();
+
+                window.clear();
+                sf::Sprite gameSprite(gameTexture.getTexture());
+                gameSprite.setPosition(sf::Vector2f(10, 10));
+                window.draw(gameSprite);
                 window.display();
             }
         }
@@ -144,16 +148,20 @@ void MainGame::Run()
                 keyboardUpdate = false;
                 mouseUpdate = false;
 
+                gameTexture.clear();
+
+                activeChunk->Draw(gameTexture);
+                this->player.Draw(gameTexture);
+                this->mouse.Draw(gameTexture);
+
+                gameTexture.display();
+
                 window.clear();
-
-                activeChunk->Draw(window);
-                this->player.Draw(window);
-                this->mouse.Draw(window);
-
+                sf::Sprite gameSprite(gameTexture.getTexture());
+                gameSprite.setPosition(sf::Vector2f(10, 10));
+                window.draw(gameSprite);
                 window.display();
             }
         }
     }
 }
-
-
