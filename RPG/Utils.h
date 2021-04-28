@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<vector>
+#include<SFML/Graphics.hpp>
 
 static std::vector<std::string> split(const std::string& txt, char ch)
 {
@@ -17,4 +18,19 @@ static std::vector<std::string> split(const std::string& txt, char ch)
     strs.push_back(txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
 
     return strs;
+}
+
+
+static bool getTexture(std::vector<std::pair<int,sf::Texture*>> textures, int index, sf::Texture*& texture)
+{
+    for (std::pair<int, sf::Texture*> p : textures)
+    {
+        if (p.first == index)
+        {
+            texture = p.second;
+            return true;
+        }
+    }
+
+    return false;
 }

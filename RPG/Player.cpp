@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Log.h"
 
 Player::Player()
 {
@@ -183,6 +184,7 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
 
     if (chunkChange)
     {
+        LOG() << "[chunk change] (" << activeChunk->position.x << ";" << activeChunk->position.y << ")";
         if (std::find(visitedChunks.begin(), visitedChunks.end(), activeChunk->position) == visitedChunks.end())
         {
             this->isNew = true;

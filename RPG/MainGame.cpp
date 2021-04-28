@@ -58,6 +58,7 @@ void MainGame::Run()
     MouseUpdate mouseUpdate;
     std::vector<Chunk*> map;
     sf::RenderTexture gameTexture;
+    GameTexture textures = GameTexture();
 
     this->player.playerPos = sf::Vector2f(4, 4);
     activeChunk->position = sf::Vector2f(0, 0);
@@ -70,6 +71,10 @@ void MainGame::Run()
          {
              HasError = true;
              errorValue = "[ERROR] Too many chunks, please do not exceed 1500 chunk.";
+         }else
+         {
+             textures.block_textures = reader.block_textures;
+             textures.enemies_textures = reader.enemies_textures;
          }
          mapReady = true;
          chunkChangeAnimation = 0.0f;
@@ -175,7 +180,7 @@ void MainGame::Run()
                 {
 
                     gameTexture.clear();
-                    activeChunk->Draw(gameTexture);
+                    activeChunk->Draw(gameTexture, textures);
                     this->player.Draw(gameTexture);
                     this->mouse.Draw(gameTexture);
                     sf::RectangleShape blur;
@@ -212,7 +217,7 @@ void MainGame::Run()
                 {
                     gameTexture.clear();
 
-                    activeChunk->Draw(gameTexture);
+                    activeChunk->Draw(gameTexture, textures);
 
                     if (mapReady)
                     {

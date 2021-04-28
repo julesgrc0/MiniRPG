@@ -14,13 +14,12 @@ public:
 	bool loadMap(std::string&);
 	std::vector<Case*> getChunk(sf::Vector2f);
 	std::vector<Chunk*> getMap();
-	sf::Texture getBlockTexture(int index);
-	sf::Texture getEnemieTexure(int index);
+
+	std::vector<std::pair<int, sf::Texture*>> block_textures;
+	std::vector<std::pair<int, sf::Texture*>> enemies_textures;
 private:
 	void setupTextures();
 	bool isset(std::vector<Chunk*>&,int, int);
 	Json::Value map;
-	std::vector<std::pair<int, sf::Texture>> block_textures;
-	std::vector<std::pair<int, sf::Texture>> enemies_textures;
 };
 
