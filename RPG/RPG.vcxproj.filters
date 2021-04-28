@@ -59,9 +59,6 @@
     <ClInclude Include="Player.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Consts.h">
-      <Filter>Fichiers sources</Filter>
-    </ClInclude>
     <ClInclude Include="Mouse.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>

@@ -3,52 +3,79 @@
 #include <cmath>
 #include <json/json.h>
 #include <thread>
+#include <Windows.h>
 
 #include "MainGame.h"
 #include "MapReader.h"
-#include "Consts.h"
 
 MainGame::MainGame()
 {
-    if (this->font.loadFromFile(FONT_PATH))
+    char* EXE_FOLDER = new char[MAX_PATH];
+    GetModuleFileNameA(NULL, EXE_FOLDER, std::ios::binary);
+    std::string pfont = std::string(EXE_FOLDER) + "\\assets\\Fonts\\Arial\\arial.ttf";
+    std::string pmap = std::string(EXE_FOLDER) + "\\assets\\Maps\\map.json";
+
+    if (this->font.loadFromFile(pfont))
     {
         this->isFontReady = true;
     }
 
-    std::thread([&]() {
-        if (!reader.loadMap(MAP_PATH))
-        {
-            HasError = true;
-            errorValue = "[ERROR] Fail to load map.json file.";
-        }
-    }).detach();
+    if (!reader.loadMap(pmap))
+    {
+        HasError = true;
+        errorValue = "[ERROR] Fail to load map.json file.";
+    }
+   
 }
 
 MainGame::~MainGame()
 {
 }
 
-bool MainGame::Init(const char *path)
-{
-    return true;
-}
 
 void MainGame::Run()
 {
     sf::RenderWindow window(sf::VideoMode(800, 500), "", sf::Style::Close);
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(0);
-
     //window.setMouseCursorVisible(false);
 
-    sf::Clock clock;
+    bool keyboardUpdate = true;
+    bool chunkChange = false;
+    bool endAnimation = false;
+    bool mapReady = false;
+
+    const float chunkAnimationDuration = 20.0f;
+    float chunkChangeAnimation = chunkAnimationDuration;
     float deltatime = 0;
-    this->player.playerPos = sf::Vector2f(4, 4);
+    int frames = 0;
 
+    time_t start = time(0);
+    time_t current = time(0);
+
+    sf::Clock clock;
     Chunk *activeChunk = new Chunk();
+    MouseUpdate mouseUpdate;
+    std::vector<Chunk*> map;
+    sf::RenderTexture gameTexture;
 
+    this->player.playerPos = sf::Vector2f(4, 4);
     activeChunk->position = sf::Vector2f(0, 0);
     activeChunk->chunk = this->reader.getChunk(activeChunk->position);
+
+    
+    std::thread([&] {
+         map = reader.getMap();
+         if (map.size() == 0)
+         {
+             HasError = true;
+             errorValue = "[ERROR] Too many chunks, please do not exceed 1500 chunk.";
+         }
+         mapReady = true;
+         chunkChangeAnimation = 0.0f;
+    }).detach();
+    
+
     if (activeChunk->chunk.size() == 0)
     {
         HasError = true;
@@ -56,20 +83,6 @@ void MainGame::Run()
     }
     
     this->player.addVisitedChunk(activeChunk->position);
-
-    bool mouseUpdate = true;
-    bool keyboardUpdate = true;
-
-    bool chunkChange = false;
-    bool endAnimation = false;
-    const float chunkAnimationDuration = 20.0f;
-    float chunkChangeAnimation = chunkAnimationDuration;
-
-    time_t start = time(0);
-    time_t current = time(0);
-    int frames = 0;
-
-    sf::RenderTexture gameTexture;
     gameTexture.create(500, 500);
 
     while (window.isOpen())
@@ -120,18 +133,22 @@ void MainGame::Run()
                 start = time(0);
             }
 
-            keyboardUpdate = this->player.KeyBoardUpdate(deltatime);
-            if (keyboardUpdate)
+            if (mapReady)
             {
-                chunkChange = this->player.MapUpdate(deltatime, reader, activeChunk);
-            }
+                keyboardUpdate = this->player.KeyBoardUpdate(deltatime);
+                if (keyboardUpdate)
+                {
+                    chunkChange = this->player.MapUpdate(deltatime, map, activeChunk);
+                }
 
-            mouseUpdate = this->mouse.Update(window);
+                mouseUpdate = this->mouse.Update(window);
 
-            for (int i = 0; i < activeChunk->chunk.size(); i++)
-            {
-                activeChunk->chunk[i]->Update(deltatime);
+                for (int i = 0; i < activeChunk->chunk.size(); i++)
+                {
+                    activeChunk->chunk[i]->Update(deltatime);
+                }
             }
+           
 
             if (chunkChange || chunkChangeAnimation < chunkAnimationDuration)
             {
@@ -174,28 +191,45 @@ void MainGame::Run()
                     sf::Sprite gameSprite(gameTexture.getTexture());
                     gameSprite.setPosition(sf::Vector2f(0, 0));
                     window.draw(gameSprite);
+                    
+                    if (this->isFontReady)
+                    {
+                        sf::Text t;
+                        t.setFont(font);
+                        t.setString("(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")");
+
+                        t.setCharacterSize(14);
+                        t.setPosition(sf::Vector2f(10, 10));
+                        window.draw(t);
+                    }
+
                     window.display();
-
-
                 }
             }
             else
             {
-                if (keyboardUpdate || mouseUpdate || endAnimation)
+                if (keyboardUpdate || mouseUpdate.hasMove || endAnimation)
                 {
-                    endAnimation = false;
-                    keyboardUpdate = false;
-                    mouseUpdate = false;
-
                     gameTexture.clear();
 
                     activeChunk->Draw(gameTexture);
-                    this->player.Draw(gameTexture);
-                    this->mouse.Draw(gameTexture);
+
+                    if (mapReady)
+                    {
+                        this->player.Draw(gameTexture);
+                        if (mouseUpdate.isOnMap)
+                        {
+                            this->mouse.Draw(gameTexture);
+                        }
+                    }
+                   
 
                     gameTexture.display();
 
-                    sf::Context context;
+                    endAnimation = false;
+                    keyboardUpdate = false;
+                    mouseUpdate.hasMove = false;
+
 
                     window.clear();
                     sf::Sprite gameSprite(gameTexture.getTexture());
@@ -206,7 +240,14 @@ void MainGame::Run()
                     {
                         sf::Text t;
                         t.setFont(font);
-                        t.setString("(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")");
+                        if (!mapReady)
+                        {
+                            t.setString("Chargement de la carte... ");
+                        }else
+                        {
+                            t.setString("(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")");
+                        }
+                        
 
                         t.setCharacterSize(14);
                         t.setPosition(sf::Vector2f(10, 10));

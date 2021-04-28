@@ -1,23 +1,44 @@
 #include "Mouse.h"
 
+
+
 Mouse::Mouse()
 {
 }
 
-bool Mouse::Update(sf::RenderWindow &window)
+MouseUpdate Mouse::Update(sf::RenderWindow &window)
 {
-    bool mouseUpdate = false;
-
+    MouseUpdate update;
     sf::Vector2f last_m_pos = this->m_pos;
     this->m_pos = sf::Vector2f(sf::Mouse::getPosition(window));
     this->m_pos = sf::Vector2f((int)this->m_pos.x / 50 * 50, (int)this->m_pos.y / 50 * 50);
 
-    if (last_m_pos.x != this->m_pos.x || last_m_pos.y != this->m_pos.y)
+    update.isOnMap = true;
+
+    if (m_pos.x < 0 || m_pos.x > this->size * 10)
     {
-        mouseUpdate = true;
+        update.isOnMap = false;
     }
 
-    return mouseUpdate;
+    if (m_pos.y < 0 || m_pos.y > this->size * 10)
+    {
+        update.isOnMap = false;
+    }
+
+
+    if (last_m_pos.x != this->m_pos.x || last_m_pos.y != this->m_pos.y)
+    {
+        update.hasMove = true;
+    }
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    {
+        update.hasClick = true;
+    }
+
+    update.coord = m_pos;
+
+    return update;
 }
 
 void Mouse::Draw(sf::RenderWindow &window)

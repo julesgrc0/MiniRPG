@@ -1,5 +1,4 @@
 #include "Player.h"
-#include "Consts.h"
 
 Player::Player()
 {
@@ -80,105 +79,20 @@ bool Player::isNewChunk()
     }
 }
 
-bool Player::MapUpdate(float deltatime, MapReader &reader, Chunk *&activeChunk)
+std::vector<Case*> Player::getChunk(std::vector<Chunk*>& chunks,sf::Vector2f position)
 {
-    this->isNew = false;
-    bool chunkChange = false;
-
-    sf::Vector2f roundPlayer = sf::Vector2f((this->playerPos.x * 50 / 50), (this->playerPos.y * 50 / 50));
-    sf::Vector2f next;
-
-    if (roundPlayer.x > 9.9)
+    for (Chunk* chunk : chunks)
     {
-        next = activeChunk->position;
-        next.x++;
-        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
-        if (c.size() > 0)
+        if (chunk->position == position)
         {
-            this->playerPos.x -= 9.5;
-            this->playerPos.x += playerSeep * deltatime;
-
-            activeChunk->chunk = c;
-            activeChunk->position = next;
-            chunkChange = true;
-        }
-        else
-        {
-            this->playerPos.x -= playerSeep * deltatime;
+            return chunk->chunk;
         }
     }
-    else if (roundPlayer.x < -0.5)
-    {
-        next = activeChunk->position;
-        next.x--;
-        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
-        if (c.size() > 0)
-        {
-            this->playerPos.x += 9.5;
-            this->playerPos.x -= playerSeep * deltatime;
-
-            activeChunk->chunk = c;
-            activeChunk->position = next;
-            chunkChange = true;
-        }
-        else
-        {
-            this->playerPos.x += playerSeep * deltatime;
-        }
-    }
-    else if (roundPlayer.y > 9.5)
-    {
-        next = activeChunk->position;
-        next.y++;
-        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
-        if (c.size() > 0)
-        {
-            this->playerPos.y -= 9.5;
-            this->playerPos.y += playerSeep * deltatime;
-
-            activeChunk->chunk = c;
-            activeChunk->position = next;
-            chunkChange = true;
-        }
-        else
-        {
-            this->playerPos.y -= playerSeep * deltatime;
-        }
-    }
-    else if (roundPlayer.y < -0.5)
-    {
-        next = activeChunk->position;
-        next.y--;
-        std::vector<Case *> c = reader.getMapChunk(MAP_PATH, next);
-        if (c.size() > 0)
-        {
-            this->playerPos.y += 9.5;
-            this->playerPos.y -= playerSeep * deltatime;
-
-            activeChunk->chunk = c;
-            activeChunk->position = next;
-            chunkChange = true;
-        }
-        else
-        {
-            this->playerPos.y += playerSeep * deltatime;
-        }
-    }
-
-    if (chunkChange)
-    {
-        if (std::find(visitedChunks.begin(), visitedChunks.end(), activeChunk->position) == visitedChunks.end())
-        {
-            this->isNew = true;
-            this->visitedChunks.push_back(activeChunk->position);
-        }
-    }
-
-    return chunkChange;
+    std::vector<Case*> cases;
+    return cases;
 }
 
-
-bool Player::MapUpdate(float deltatime, JsonMapReader& reader, Chunk*& activeChunk)
+bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& activeChunk)
 {
     this->isNew = false;
     bool chunkChange = false;
@@ -186,11 +100,14 @@ bool Player::MapUpdate(float deltatime, JsonMapReader& reader, Chunk*& activeChu
     sf::Vector2f roundPlayer = sf::Vector2f((this->playerPos.x * 50 / 50), (this->playerPos.y * 50 / 50));
     sf::Vector2f next;
 
-    if (roundPlayer.x > 9.9)
+    float max_out_detection = 9.5;
+    float min_out_detection = -0.5;
+
+    if (roundPlayer.x > max_out_detection)
     {
         next = activeChunk->position;
         next.x++;
-        std::vector<Case*> c = reader.getChunk(next);
+        std::vector<Case*> c = this->getChunk(chunks,next);
         if (c.size() > 0)
         {
             this->playerPos.x -= 9.5;
@@ -205,11 +122,11 @@ bool Player::MapUpdate(float deltatime, JsonMapReader& reader, Chunk*& activeChu
             this->playerPos.x -= playerSeep * deltatime;
         }
     }
-    else if (roundPlayer.x < -0.5)
+    else if (roundPlayer.x < min_out_detection)
     {
         next = activeChunk->position;
         next.x--;
-        std::vector<Case*> c = reader.getChunk(next);
+        std::vector<Case*> c = this->getChunk(chunks, next);
         if (c.size() > 0)
         {
             this->playerPos.x += 9.5;
@@ -224,11 +141,12 @@ bool Player::MapUpdate(float deltatime, JsonMapReader& reader, Chunk*& activeChu
             this->playerPos.x += playerSeep * deltatime;
         }
     }
-    else if (roundPlayer.y > 9.5)
+    
+    if (roundPlayer.y > max_out_detection)
     {
         next = activeChunk->position;
         next.y++;
-        std::vector<Case*> c = reader.getChunk(next);
+        std::vector<Case*> c = this->getChunk(chunks, next);
         if (c.size() > 0)
         {
             this->playerPos.y -= 9.5;
@@ -243,11 +161,11 @@ bool Player::MapUpdate(float deltatime, JsonMapReader& reader, Chunk*& activeChu
             this->playerPos.y -= playerSeep * deltatime;
         }
     }
-    else if (roundPlayer.y < -0.5)
+    else if (roundPlayer.y < min_out_detection)
     {
         next = activeChunk->position;
         next.y--;
-        std::vector<Case*> c = reader.getChunk(next);
+        std::vector<Case*> c = this->getChunk(chunks, next);
         if (c.size() > 0)
         {
             this->playerPos.y += 9.5;

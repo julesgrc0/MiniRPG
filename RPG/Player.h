@@ -9,8 +9,7 @@ public:
 	Player();
 	~Player();
 	bool KeyBoardUpdate(float deltatime);
-	bool MapUpdate(float deltatime, MapReader& reader, Chunk*& activeChunk);
-	bool MapUpdate(float deltatime, JsonMapReader& reader, Chunk*& activeChunk);
+	bool MapUpdate(float deltatime,std::vector<Chunk*>&, Chunk*& activeChunk);
 	bool isNewChunk();
 	void addVisitedChunk(sf::Vector2f);
 
@@ -24,4 +23,5 @@ private:
 	const int Max_player_speed = 6;
 	int playerSeep = Max_player_speed;
 	std::vector<sf::Vector2f> visitedChunks;
+	std::vector<Case*> getChunk(std::vector<Chunk*>& ,sf::Vector2f);
 };
