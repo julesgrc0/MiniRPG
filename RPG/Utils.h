@@ -34,3 +34,26 @@ static bool getTexture(std::vector<std::pair<int,sf::Texture*>> textures, int in
 
     return false;
 }
+
+
+static Case* getCaseByPosition(std::vector<Case*> cases, sf::Vector2f pos)
+{
+    sf::Vector2f iPos = sf::Vector2f(0, 0);
+    for (int i = 0; i < 100; i += 10)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            if (iPos == pos)
+            {
+                return cases[static_cast<__int64>(i) + j];
+            }
+            iPos.x++;
+        }
+
+        iPos.y++;
+        iPos.x = 0;
+    }
+
+    Case* none = new Case(50);
+    return none;
+}

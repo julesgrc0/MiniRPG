@@ -22,17 +22,13 @@ sf::Sprite Case::Draw(sf::Vector2f pos, GameTexture& textures)
 
 	if (textures.block_textures.size() != 0)
 	{
-		switch (this->type)
+		for (CaseTypes type = GRASS; type != NONE; type = (CaseTypes)((int)type + 1))
 		{
-		case GRASS:
-			this->SetTexture(textures, 1);
-			break;
-		case SAND:
-			this->SetTexture(textures, 2);
-			break;
-		case WATER:
-			this->SetTexture(textures, 3);
-			break;
+			if (this->type == type)
+			{
+				this->SetTexture(textures, (int)type);
+				break;
+			}
 		}
 	}
 
@@ -48,7 +44,6 @@ void Case::SetTexture(GameTexture& textures,int id)
 	{
 		this->texture.clear();
 		sf::Sprite sprite((*img));
-		sprite.setPosition(sf::Vector2f(0, 0));
 		this->texture.draw(sprite);
 	}
 }
@@ -65,6 +60,9 @@ void Case::DrawDefault()
 		break;
 	case WATER:
 		this->texture.clear(sf::Color::Color(31, 169, 219, 255));
+		break;
+	case GROUND:
+		this->texture.clear(sf::Color::Color(67, 44, 21));
 		break;
 	default:
 		this->texture.clear();

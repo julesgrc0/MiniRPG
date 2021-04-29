@@ -7,6 +7,8 @@
 
 #include "MainGame.h"
 #include "MapReader.h"
+#include "Log.h"
+#include "Utils.h"
 
 MainGame::MainGame()
 {
@@ -178,7 +180,6 @@ void MainGame::Run()
 
                 if (!endAnimation)
                 {
-
                     gameTexture.clear();
                     activeChunk->Draw(gameTexture, textures);
                     this->player.Draw(gameTexture);
@@ -225,6 +226,7 @@ void MainGame::Run()
                         if (mouseUpdate.isOnMap)
                         {
                             this->mouse.Draw(gameTexture);
+                            // LOG() << "[mouse active] " << (int)getCaseByPosition(activeChunk->chunk, sf::Vector2f(mouseUpdate.coord.x / 50, mouseUpdate.coord.y / 50))->type;
                         }
                     }
                    

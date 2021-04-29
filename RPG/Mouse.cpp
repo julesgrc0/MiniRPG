@@ -14,13 +14,12 @@ MouseUpdate Mouse::Update(sf::RenderWindow &window)
     this->m_pos = sf::Vector2f((int)this->m_pos.x / 50 * 50, (int)this->m_pos.y / 50 * 50);
 
     update.isOnMap = true;
-
-    if (m_pos.x < 0 || m_pos.x > this->size * 10)
+    if (m_pos.x < 0 || m_pos.x >= this->size * 10)
     {
         update.isOnMap = false;
     }
 
-    if (m_pos.y < 0 || m_pos.y > this->size * 10)
+    if (m_pos.y < 0 || m_pos.y >= this->size * 10)
     {
         update.isOnMap = false;
     }

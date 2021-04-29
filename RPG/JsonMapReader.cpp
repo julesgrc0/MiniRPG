@@ -51,15 +51,12 @@ std::vector<Chunk*> JsonMapReader::getMap()
                     for (Json::Value jsonBlock : jsonChunk["chunk"])
                     {
                         Case* block = new Case(50);
-                        block->type = GRASS;
-                        switch (jsonBlock.asInt())
+                        for (CaseTypes type = GRASS; type != NONE; type = (CaseTypes)((int)type + 1))
                         {
-                        case 1:
-                            block->type = WATER;
-                            break;
-                        case 2:
-                            block->type = SAND;
-                            break;
+                            if ((int)type == jsonBlock.asInt())
+                            {
+                                block->type = (CaseTypes)type;
+                            }
                         }
                         chunk->chunk.push_back(block);
                     }
@@ -89,15 +86,12 @@ std::vector<Case*> JsonMapReader::getChunk(sf::Vector2f position)
                     for (Json::Value jsonBlock : jsonChunk["chunk"])
                     {
                         Case* block = new Case(50);
-                        block->type = GRASS;
-                        switch (jsonBlock.asInt())
+                        for (CaseTypes type = GRASS; type != NONE; type = (CaseTypes)((int)type + 1))
                         {
-                        case 1:
-                            block->type = WATER;
-                            break;
-                        case 2:
-                            block->type = SAND;
-                            break;
+                            if ((int)type == jsonBlock.asInt())
+                            {
+                                block->type = (CaseTypes)type;
+                            }
                         }
                         cases.push_back(block);
                     }
@@ -152,11 +146,16 @@ void JsonMapReader::setupTextures()
             {
                 if (texture["id"] && texture["value"])
                 {
-                    sf::Texture* block = new sf::Texture();
-                    if(block->loadFromFile(texture["value"].asString()))
+                    sf::Image image;
+                    if (image.loadFromFile((texture["value"].asString())))
                     {
-                        std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
-                        this->block_textures.push_back(p);
+                        image.flipVertically();
+                        sf::Texture* block = new sf::Texture();
+                        if (block->loadFromImage(image))
+                        {
+                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
+                            this->block_textures.push_back(p);
+                        }
                     }
                 }
                 i++;
@@ -172,13 +171,18 @@ void JsonMapReader::setupTextures()
             {
                 if (texture["id"] && texture["value"])
                 {
-                    sf::Texture* enim = new sf::Texture();
-
-                    if (enim->loadFromFile(texture["value"].asString()))
+                    sf::Image image;
+                    if (image.loadFromFile((texture["value"].asString())))
                     {
-                        std::pair<int, sf::Texture*> p = { texture["id"].asInt(),enim };
-                        this->enemies_textures.push_back(p);
+                        image.flipVertically();
+                        sf::Texture* enim = new sf::Texture();
+                        if (enim->loadFromImage(image))
+                        {
+                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),enim };
+                            this->enemies_textures.push_back(p);
+                        }
                     }
+
                 }
                 i++;
                 LOG() << "[texture block] " << i << "/" << size;
