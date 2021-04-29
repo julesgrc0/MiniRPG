@@ -16,9 +16,23 @@ public:
 	void Draw(sf::RenderWindow &);
 	void Draw(sf::RenderTexture &);
 
-	sf::Vector2f playerPos;
+	bool isCollisionBlock(CaseTypes&);
+	void goForward();
 
+	sf::Vector2f playerPos;
+	
 private:
+	const CaseTypes collisions[8] = {
+		CASTLE_WALL_L,
+		CASTLE_WALL_R,
+		CASTLE_WALL_T,
+		CASTLE_WALL_B,
+		CASTLE_WALL_ANGLE_L,
+		CASTLE_WALL_ANGLE_T,
+		CASTLE_WALL_ANGLE_R,
+		CASTLE_WALL_ANGLE_B,
+	};
+	sf::Vector2f lastPos;
 	bool isNew = false;
 	const int Max_player_speed = 6;
 	int playerSeep = Max_player_speed;

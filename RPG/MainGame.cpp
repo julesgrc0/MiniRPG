@@ -145,6 +145,12 @@ void MainGame::Run()
                 keyboardUpdate = this->player.KeyBoardUpdate(deltatime);
                 if (keyboardUpdate)
                 {
+                    sf::Vector2f cubePlayerPos = sf::Vector2f(round(this->player.playerPos.x), round(this->player.playerPos.y));
+                    if (this->player.isCollisionBlock(getCaseByPosition(activeChunk->chunk, cubePlayerPos)->type))
+                    {
+                        this->player.goForward();
+                    }
+
                     chunkChange = this->player.MapUpdate(deltatime, map, activeChunk);
                 }
 

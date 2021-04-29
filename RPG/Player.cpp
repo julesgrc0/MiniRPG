@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Log.h"
+#include "Utils.h"
 
 Player::Player()
 {
@@ -30,9 +31,29 @@ void Player::addVisitedChunk(sf::Vector2f chunk)
     }
 }
 
+void Player::goForward()
+{
+    this->playerPos = this->lastPos;
+}
+
+bool Player::isCollisionBlock(CaseTypes& type)
+{
+    for (CaseTypes Itemtype : this->collisions)
+    {
+        if (Itemtype == type)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Player::KeyBoardUpdate(float deltatime)
 {
     bool keyboardUpdate = false;
+
+     sf::Vector2f lpos = this->playerPos;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
     {
@@ -64,6 +85,11 @@ bool Player::KeyBoardUpdate(float deltatime)
         keyboardUpdate = true;
     }
 
+    if (keyboardUpdate)
+    {
+        this->lastPos = lpos;
+    }
+   
     return keyboardUpdate;
 }
 
