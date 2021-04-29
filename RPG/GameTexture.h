@@ -8,6 +8,7 @@ public:
 	GameTexture();
 	~GameTexture();
 	std::vector<std::pair<int, sf::Texture*>> block_textures;
-	std::vector < std::pair<int, sf::Texture*>> enemies_textures;
+	std::vector<std::pair<int, sf::Texture*>> enemies_textures;
+	std::vector<std::pair<int, sf::Texture*>> items_textures;
 };
 

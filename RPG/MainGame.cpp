@@ -77,6 +77,7 @@ void MainGame::Run()
          {
              textures.block_textures = reader.block_textures;
              textures.enemies_textures = reader.enemies_textures;
+             textures.items_textures = reader.items_textures;
          }
          mapReady = true;
          chunkChangeAnimation = 0.0f;
@@ -146,7 +147,7 @@ void MainGame::Run()
                 if (keyboardUpdate)
                 {
                     sf::Vector2f cubePlayerPos = sf::Vector2f(round(this->player.playerPos.x), round(this->player.playerPos.y));
-                    if (this->player.isCollisionBlock(getCaseByPosition(activeChunk->chunk, cubePlayerPos)->type))
+                    if (this->player.isCollisionBlock(getCaseByPosition(activeChunk->chunk, cubePlayerPos)->case_type))
                     {
                         this->player.goForward();
                     }

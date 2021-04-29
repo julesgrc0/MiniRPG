@@ -24,7 +24,7 @@ sf::Sprite Case::Draw(sf::Vector2f pos, GameTexture& textures)
 	{
 		for (CaseTypes type = GRASS; type != NONE; type = (CaseTypes)((int)type + 1))
 		{
-			if (this->type == type)
+			if (this->case_type == type)
 			{
 				this->SetTexture(textures, (int)type);
 				break;
@@ -50,7 +50,7 @@ void Case::SetTexture(GameTexture& textures,int id)
 
 void Case::DrawDefault()
 {
-	switch (this->type)
+	switch (this->case_type)
 	{
 	case GRASS:
 		this->texture.clear(sf::Color::Color(68, 204, 14, 255));

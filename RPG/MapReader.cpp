@@ -43,7 +43,7 @@ std::vector<Chunk *> MapReader::getFullMap(const char *filepath)
                         type = SAND;
                         break;
                     }
-                    item->type = type;
+                    item->case_type = type;
 
                     chunk->chunk.push_back(item);
                 }
@@ -93,7 +93,7 @@ std::vector<Case *> MapReader::getMapChunk(const char *filepath, sf::Vector2f po
                             break;
                         }
 
-                        item->type = type;
+                        item->case_type = type;
                         res.push_back(item);
                     }
                 }

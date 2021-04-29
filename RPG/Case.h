@@ -162,12 +162,14 @@ enum CaseTypes
 	NONE
 };
 
+
+
 class Case
 {
 public:
 	Case(int);
 	~Case();
-	CaseTypes type = NONE;
+	CaseTypes case_type = CaseTypes::NONE;
 
 	void Update(float);
 	sf::Sprite Draw(sf::Vector2f, GameTexture &reader);

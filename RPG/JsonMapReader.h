@@ -17,6 +17,7 @@ public:
 
 	std::vector<std::pair<int, sf::Texture*>> block_textures;
 	std::vector<std::pair<int, sf::Texture*>> enemies_textures;
+	std::vector<std::pair<int, sf::Texture*>> items_textures;
 private:
 	void setupTextures();
 	bool isset(std::vector<Chunk*>&,int, int);
