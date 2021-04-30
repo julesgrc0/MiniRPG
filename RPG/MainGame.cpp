@@ -16,10 +16,11 @@ MainGame::MainGame()
     GetModuleFileNameA(NULL, EXE_FOLDER, std::ios::binary);
     std::string pfont = std::string(EXE_FOLDER) + "\\assets\\Fonts\\Arial\\arial.ttf";
     std::string pmap = std::string(EXE_FOLDER) + "\\assets\\Maps\\map.json";
+    delete EXE_FOLDER;
 
     if (this->font.loadFromFile(pfont))
     {
-        this->isFontReady = true;
+        isFontReady = true;
     }
 
     if (!reader.loadMap(pmap))
@@ -35,17 +36,11 @@ MainGame::~MainGame()
 
 
 void MainGame::Run()
-{
-    sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
-    settings.antialiasingLevel = 4;
-    settings.majorVersion = 3;
-    settings.minorVersion = 0;
-    sf::RenderWindow window(sf::VideoMode(800, 500), "", sf::Style::Close, settings);
+{    
+    sf::RenderWindow window(sf::VideoMode(800, 500), "", sf::Style::Close);
+    
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(0);
-    //window.setMouseCursorVisible(false);
 
     bool keyboardUpdate = true;
     bool chunkChange = false;
@@ -61,6 +56,7 @@ void MainGame::Run()
     time_t current = time(0);
 
     sf::Clock clock;
+    sf::Event event;
     Chunk *activeChunk = new Chunk();
     MouseUpdate mouseUpdate;
     std::vector<Chunk*> map;
@@ -69,10 +65,20 @@ void MainGame::Run()
 
     this->player.playerPos = sf::Vector2f(4, 4);
     activeChunk->position = sf::Vector2f(0, 0);
-    activeChunk->chunk = this->reader.getChunk(activeChunk->position);
+    
+    for (size_t i = 0; i < 100; i++)
+    {
+        Case* item = new Case(50);
+        activeChunk->chunk.push_back(item);
+    }
 
+    std::thread([&] {
+        activeChunk->chunk = this->reader.getChunk(activeChunk->position);
+     }).detach();
     
     std::thread([&] {
+         while(!reader.isTexturesLoad) {}
+         
          map = reader.getMap();
          if (map.size() == 0)
          {
@@ -87,6 +93,7 @@ void MainGame::Run()
          }
          mapReady = true;
          chunkChangeAnimation = 0.0f;
+         
     }).detach();
     
 
@@ -98,12 +105,9 @@ void MainGame::Run()
     
     this->player.addVisitedChunk(activeChunk->position);
     gameTexture.create(500, 500);
-
+    
     while (window.isOpen())
-    {
-
-
-        sf::Event event;
+    {  
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
@@ -143,13 +147,14 @@ void MainGame::Run()
             if (current - start >= (time_t)1)
             {
                 window.setTitle(std::to_string(frames));
+
                 frames = 0;
                 start = time(0);
             }
 
             if (mapReady)
             {
-                keyboardUpdate = this->player.KeyBoardUpdate(deltatime);
+                keyboardUpdate = this->player.KeyBoardUpdate(deltatime,activeChunk->chunk);
                 if (keyboardUpdate)
                 {
                     sf::Vector2f cubePlayerPos = sf::Vector2f(round(this->player.playerPos.x), round(this->player.playerPos.y));
@@ -213,16 +218,10 @@ void MainGame::Run()
                     
                     if (this->isFontReady)
                     {
-                        sf::Text t;
-                        t.setFont(font);
-                        t.setString("(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")");
-
-                        t.setCharacterSize(14);
-                        t.setPosition(sf::Vector2f(10, 10));
-                        window.draw(t);
+                        this->DrawText(window, "(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")", sf::Vector2f(10, 10));
                     }
 
-                    window.display();
+                   window.display();
                 }
             }
             else
@@ -239,8 +238,15 @@ void MainGame::Run()
                         this->player.Draw(gameTexture, textures);
                         if (mouseUpdate.isOnMap)
                         {
+                            window.setMouseCursorVisible(false);
                             this->mouse.Draw(gameTexture);
-                            // LOG() << "[mouse active] " << (int)getCaseByPosition(activeChunk->chunk, sf::Vector2f(mouseUpdate.coord.x / 50, mouseUpdate.coord.y / 50))->type;
+                            if (mouseUpdate.hasClick)
+                            {
+                                LOG() << "[mouse block] " << (int)getCaseByPosition(activeChunk->chunk, sf::Vector2f(mouseUpdate.coord.x / 50, mouseUpdate.coord.y / 50))->case_type;
+                            }
+                        }else
+                        {
+                            window.setMouseCursorVisible(true);
                         }
                     }
 
@@ -271,6 +277,9 @@ void MainGame::Run()
             }
         }
     }
+
+    delete activeChunk;
+    map.clear();
 }
 
 void MainGame::DrawText(sf::RenderWindow& window,sf::String text,sf::Vector2f pos)

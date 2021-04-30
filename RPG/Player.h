@@ -5,16 +5,10 @@
 
 enum PlayerStates
 {
-	STATIC,
-	C_ARM,
-	C_ATTACK,
+	STATIC_L,
+	STATIC_R,
+	
 
-	STATIC_SHIRT,
-	H_N_ATTACK,
-	H_ATTACK,
-
-	STATIC__STUFF_R,
-	STATIC_STUFF,
 	S_N_ATTACK,
 	S_ATTACK_1,
 	S_ATTACK_2,
@@ -34,7 +28,7 @@ public:
 	Player();
 	~Player();
 	
-	bool KeyBoardUpdate(float deltatime);
+	bool KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk);
 	bool MapUpdate(float deltatime,std::vector<Chunk*>&, Chunk*& activeChunk);
 	bool isNewChunk();
 	void addVisitedChunk(sf::Vector2f);
@@ -60,9 +54,18 @@ private:
 	};
 	
 	sf::Vector2f lastPos;
+
+	PlayerStates activeState = STATIC_L;
+
+	bool getTexture(PlayerStates, GameTexture&, sf::Texture*&);
+
+	bool isDirectionR = false;
 	bool isNew = false;
 	const int Max_player_speed = 5;
 	int playerSeep = Max_player_speed;
+	int playerXP = 0;
+	float animation = 0.0f;
+	bool isAnimationActive = false;
 
 	std::vector<sf::Vector2f> visitedChunks;
 	std::vector<Case*> getChunk(std::vector<Chunk*>& ,sf::Vector2f);

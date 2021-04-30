@@ -176,7 +176,7 @@ public:
 
 private:
 	void DrawDefault();
-	void SetTexture(GameTexture &textures, int id);
+	bool SetTexture(GameTexture &textures, int id);
 	sf::RenderTexture texture;
 	float time = 0.0f;
 };

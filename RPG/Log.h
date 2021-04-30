@@ -17,7 +17,9 @@ public:
     }
 
     ~LOG()
-    {
-        std::cout << std::endl;
+    {   
+        #ifdef _DEBUG
+            std::cout << std::endl;
+        #endif // _DEBUG
     }
 };

@@ -5,7 +5,7 @@
 Player::Player()
 {
 }
-void Player::Draw(sf::RenderWindow &window,GameTexture& textures)
+void Player::Draw(sf::RenderWindow& window, GameTexture& textures)
 {
     sf::CircleShape circ;
     circ.setFillColor(sf::Color::Black);
@@ -14,13 +14,36 @@ void Player::Draw(sf::RenderWindow &window,GameTexture& textures)
     window.draw(circ);
 }
 
-void Player::Draw(sf::RenderTexture &texture,GameTexture& textures)
+void Player::Draw(sf::RenderTexture& texture, GameTexture& textures)
 {
-    sf::CircleShape circ;
-    circ.setFillColor(sf::Color::Black);
-    circ.setRadius(25.0f);
-    circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
-    texture.draw(circ);
+    sf::Texture* textureItem = new sf::Texture();
+    if (this->getTexture(this->activeState, textures,textureItem))
+    {
+        sf::Sprite sprite = sf::Sprite(*textureItem);
+        sprite.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
+        texture.draw(sprite);
+    }else
+    {
+        sf::CircleShape circ;
+        circ.setFillColor(sf::Color::Black);
+        circ.setRadius(25.0f);
+        circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
+        texture.draw(circ);
+    }
+}
+
+bool Player::getTexture(PlayerStates state, GameTexture& textures,sf::Texture*& textureItem)
+{
+    for (std::pair<int, sf::Texture*> p : textures.players_textures)
+    {
+        if (p.first == (int)state)
+        {
+            textureItem = p.second;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Player::addVisitedChunk(sf::Vector2f chunk)
@@ -49,11 +72,36 @@ bool Player::isCollisionBlock(CaseTypes& type)
     return false;
 }
 
-bool Player::KeyBoardUpdate(float deltatime)
+bool Player::KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk)
 {
     bool keyboardUpdate = false;
 
      sf::Vector2f lpos = this->playerPos;
+
+     sf::Vector2f roundPlayer = sf::Vector2f(round(this->playerPos.x), round(this->playerPos.y));
+     CaseTypes type = getCaseByPosition(chunk, roundPlayer)->case_type;
+
+     if (type != CaseTypes::NONE)
+     {
+         switch (type)
+         {
+         case WATER:
+             this->activeState = S_WATER;
+             break;
+         default:
+         {
+             if (isDirectionR)
+             {
+                 this->activeState = STATIC_R;
+             }
+             else
+             {
+                 this->activeState = STATIC_L;
+             }
+         }
+         break;
+         }
+     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
     {
@@ -62,6 +110,22 @@ bool Player::KeyBoardUpdate(float deltatime)
     else
     {
         this->playerSeep = this->Max_player_speed;
+    }
+
+    if (this->activeState != S_WATER)
+    {
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+        {
+            this->activeState = S_ATTACK;
+            playerSeep = this->Max_player_speed - 2;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            this->activeState = S_DEFEND;
+            playerSeep = 2;
+        }
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -76,14 +140,29 @@ bool Player::KeyBoardUpdate(float deltatime)
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
+        this->isDirectionR = true;
         this->playerPos.x -= playerSeep * deltatime;
         keyboardUpdate = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
+        this->isDirectionR = false;
         this->playerPos.x += playerSeep * deltatime;
         keyboardUpdate = true;
     }
+
+    if ((this->activeState == STATIC_L || this->activeState == STATIC_R))
+    {
+        if (isDirectionR)
+        {
+            this->activeState = STATIC_R;
+        }
+        else
+        {
+            this->activeState = STATIC_L;
+        }
+    }
+
 
     if (keyboardUpdate)
     {
@@ -223,4 +302,5 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
 
 Player::~Player()
 {
+    this->visitedChunks.clear();
 }

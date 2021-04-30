@@ -57,3 +57,18 @@ static Case* getCaseByPosition(std::vector<Case*> cases, sf::Vector2f pos)
     Case* none = new Case(50);
     return none;
 }
+
+static void resizeImage(const sf::Image& originalImage, sf::Image& resizedImage)
+{
+    const sf::Vector2u originalImageSize{ originalImage.getSize() };
+    const sf::Vector2u resizedImageSize{ resizedImage.getSize() };
+    for (unsigned int y{ 0u }; y < resizedImageSize.y; ++y)
+    {
+        for (unsigned int x{ 0u }; x < resizedImageSize.x; ++x)
+        {
+            unsigned int origX{ static_cast<unsigned int>(static_cast<double>(x) / resizedImageSize.x * originalImageSize.x) };
+            unsigned int origY{ static_cast<unsigned int>(static_cast<double>(y) / resizedImageSize.y * originalImageSize.y) };
+            resizedImage.setPixel(x, y, originalImage.getPixel(origX, origY));
+        }
+    }
+}

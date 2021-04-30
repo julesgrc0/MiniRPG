@@ -17,9 +17,13 @@ private:
 
 	Player player;
 	Mouse mouse;
-	sf::Font font;
-	bool isFontReady = false;
 	JsonMapReader reader;
-	bool HasError = false;
+
+	sf::Font font;
 	std::string errorValue = "";
+	
+	bool HasError = false;
+	bool isFontReady = false;
+	
+	
 };

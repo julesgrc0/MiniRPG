@@ -3,6 +3,7 @@
 #include "JsonMapReader.h"
 #include<thread>
 #include "Log.h"
+#include "Utils.h"
 
 JsonMapReader::JsonMapReader()
 {
@@ -134,7 +135,7 @@ std::vector<Case*> JsonMapReader::getChunk(sf::Vector2f position)
     return cases;
 }
 
-bool JsonMapReader::loadMap(std::string& path)
+bool JsonMapReader::loadMap(std::string path)
 {
    FILE* file = fopen(path.c_str(), "r");
     char c;
@@ -158,11 +159,63 @@ bool JsonMapReader::loadMap(std::string& path)
     sin >> this->map;
     if (this->map["map"])
     {
-        this->setupTextures();
+        std::thread([&] {
+            setupTextures();
+            isTexturesLoad = true;
+            }).detach();
         return true;
     }
 
     return false;
+}
+
+void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vector<std::pair<int, sf::Texture*>>& listTextures)
+{
+    if (this->map["textures"][type])
+    {
+        int size = this->map["textures"][type].size();
+        int i = 0;
+        for (Json::Value texture : this->map["textures"][type])
+        {
+            if (texture["id"] && texture["value"])
+            {
+                sf::Image image;
+                if (image.loadFromFile((texture["value"].asString())))
+                {
+                    if (type != "player")
+                    {
+                        image.flipVertically();
+                    }
+
+                    sf::Texture* block = new sf::Texture();
+
+                    if (image.getSize().x > 50 || image.getSize().y > 50)
+                    {
+                        sf::Image newImage = sf::Image();
+                        newImage.create(50, 50);
+                        resizeImage(image, newImage);
+
+                        if (block->loadFromImage(newImage))
+                        {
+                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
+                            listTextures.push_back(p);
+                        }
+                    }
+                    else
+                    {
+                        if (block->loadFromImage(image))
+                        {
+                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
+                            listTextures.push_back(p);
+                        }
+                    }
+                }
+            }
+
+            i++;
+            LOG() << "[texture " << type << "] " << i << "/" << size;
+        }
+    }
 }
 
 void JsonMapReader::setupTextures()
@@ -170,108 +223,11 @@ void JsonMapReader::setupTextures()
     if (this->map["textures"])
     {
         LOG() << "[info] Loading textures";
-        if (this->map["textures"]["block"])
-        {
-            int size = this->map["textures"]["block"].size();
-            int i = 0;
-            for (Json::Value texture : this->map["textures"]["block"])
-            {
-                if (texture["id"] && texture["value"])
-                {
-                    sf::Image image;
-                    if (image.loadFromFile((texture["value"].asString())))
-                    {
-                        image.flipVertically();
-                        sf::Texture* block = new sf::Texture();
-                        if (block->loadFromImage(image))
-                        {
-                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
-                            this->block_textures.push_back(p);
-                        }
-                    }
-                }
-                i++;
-                LOG() << "[texture block] " << i << "/" << size;
-            }
-        }
-
-        if (this->map["textures"]["enemies"])
-        {
-            int size = this->map["textures"]["enemies"].size();
-            int i = 0;
-            for (Json::Value texture : this->map["textures"]["enemies"])
-            {
-                if (texture["id"] && texture["value"])
-                {
-                    sf::Image image;
-                    if (image.loadFromFile((texture["value"].asString())))
-                    {
-                        image.flipVertically();
-                        sf::Texture* enim = new sf::Texture();
-                        if (enim->loadFromImage(image))
-                        {
-                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),enim };
-                            this->items_textures.push_back(p);
-                        }
-                    }
-
-                }
-                i++;
-                LOG() << "[texture enemies] " << i << "/" << size;
-            }
-        }
-
-        if (this->map["textures"]["player"])
-        {
-            int size = this->map["textures"]["player"].size();
-            int i = 0;
-            for (Json::Value texture : this->map["textures"]["player"])
-            {
-                if (texture["id"] && texture["value"])
-                {
-                    sf::Image image;
-                    if (image.loadFromFile((texture["value"].asString())))
-                    {
-                        image.flipVertically();
-                        sf::Texture* player = new sf::Texture();
-                        if (player->loadFromImage(image))
-                        {
-                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),player };
-                            this->players_textures.push_back(p);
-                        }
-                    }
-
-                }
-                i++;
-                LOG() << "[texture player] " << i << "/" << size;
-            }
-        }
-
-        if (this->map["textures"]["items"])
-        {
-            int size = this->map["textures"]["items"].size();
-            int i = 0;
-            for (Json::Value texture : this->map["textures"]["items"])
-            {
-                if (texture["id"] && texture["value"])
-                {
-                    sf::Image image;
-                    if (image.loadFromFile((texture["value"].asString())))
-                    {
-                        image.flipVertically();
-                        sf::Texture* enim = new sf::Texture();
-                        if (enim->loadFromImage(image))
-                        {
-                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),enim };
-                            this->items_textures.push_back(p);
-                        }
-                    }
-
-                }
-                i++;
-                LOG() << "[texture items] " << i << "/" << size;
-            }
-        }
+        
+        this->setupTexture(this->map["textures"], "block", this->block_textures);
+        this->setupTexture(this->map["textures"], "enemies", this->enemies_textures);
+        this->setupTexture(this->map["textures"], "player", this->players_textures);
+        this->setupTexture(this->map["textures"], "items", this->items_textures);
     }
 }
 
@@ -280,4 +236,6 @@ JsonMapReader::~JsonMapReader()
     this->map.clear();
     this->block_textures.clear();
     this->enemies_textures.clear();
+    this->items_textures.clear();
+    this->players_textures.clear();
 }

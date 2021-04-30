@@ -66,4 +66,5 @@ void Mouse::Draw(sf::RenderTexture &texture)
 
 Mouse::~Mouse()
 {
+ 
 }

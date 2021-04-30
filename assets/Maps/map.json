@@ -11,7 +11,28 @@
 		}
 		],
         "enemies": [],
-        "player":[],
+        "player":[
+            {
+                "id":0,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_07.png"
+            },
+            {
+                "id":1,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_09.png"
+            },
+            {
+                "id":10,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_08.png"
+            },
+            {
+                "id":7,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_15.png"
+            },
+            {
+                "id":6,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_11.png"
+            }
+        ],
         "items":[]
     },
     "map": [

@@ -21,11 +21,14 @@ void Chunk::Draw(sf::RenderTexture &texture, GameTexture& textures)
     {
         for (int j = 0; j < 10; j++)
         {
-            texture.draw(this->chunk[static_cast<__int64>(i) + j]->Draw(sf::Vector2f(j * this->size, i * this->size / 10), textures));
+            texture.draw(this->chunk[i + j]->Draw(sf::Vector2f(j * this->size, i * this->size / 10), textures));
         }
     }
 }
 
 Chunk::~Chunk()
 {
+    this->chunk.clear();
+    this->listEnemies.clear();
+    this->listItems.clear();
 }
