@@ -3,14 +3,16 @@
         "block": [
 		{
 			"id":27,
-            "value":"C:/Users/jules/source/repos/RPG/assets/Maps/ground_grass_t.png"
+            "value":"C:/Users/jules/source/repos/RPG/assets/Images/blocks/ground_grass_t.png"
 		},
 		{
 			"id":28,
-            "value":"C:/Users/jules/source/repos/RPG/assets/Maps/ground_grass_b.png"
+            "value":"C:/Users/jules/source/repos/RPG/assets/Images/blocks/ground_grass_b.png"
 		}
 		],
-        "enemies": []
+        "enemies": [],
+        "player":[],
+        "items":[]
     },
     "map": [
         {
@@ -119,8 +121,7 @@
                 0,
                 0,
                 0
-            ],
-            "enemies": []
+            ]
         },
         {
             "coord": {
@@ -229,7 +230,26 @@
                 0,
                 2
             ],
-            "enemies": []
+            "items":[
+                {
+                    "coord":
+                    {
+                        "x":9,
+                        "y":1
+                    },
+                    "type":0
+                }
+            ],
+            "enemies":[
+                {
+                    "coord":
+                    {
+                        "x":1,
+                        "y":1
+                    },
+                    "type":0
+                }
+            ]
         },
         {
             "coord": {

@@ -12,6 +12,9 @@ public:
 	void Run();
 
 private:
+
+	void DrawText(sf::RenderWindow&, sf::String, sf::Vector2f);
+
 	Player player;
 	Mouse mouse;
 	sf::Font font;

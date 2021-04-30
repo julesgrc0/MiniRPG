@@ -45,61 +45,7 @@ std::vector<Chunk*> JsonMapReader::getMap()
             {
                 if (jsonChunk["chunk"].size() == 100)
                 {
-                    Chunk* chunk = new Chunk();
-                    chunk->position = sf::Vector2f(x, y);
-                    
-                    for (Json::Value jsonEn : jsonChunk["enemies"])
-                    {
-                        if (jsonEn["coord"] && jsonEn["coord"]["x"] && jsonEn["coord"]["y"] && jsonEn["type"])
-                        {
-                            for (EnemiTypes type = GOBLIN; type != NONE; type = (EnemiTypes)((int)type + 1))
-                            {
-                                if (type == jsonEn["type"].asInt())
-                                {
-                                    std::pair<sf::Vector2f, EnemiTypes> en = { 
-                                        sf::Vector2f(jsonEn["coord"]["x"].asInt(),jsonEn["coord"]["y"].asInt()),
-                                        type
-                                    };
-                                    chunk->listEnemies.push_back(en);
-                                }
-                            }
-                        }
-                    }
-
-                    for (Json::Value jsonIt : jsonChunk["items"])
-                    {
-                        if (jsonIt["coord"] && jsonIt["coord"]["x"] && jsonIt["coord"]["y"] && jsonIt["type"])
-                        {
-                            for (ItemTypes type = SWORD; type != NONE; type = (ItemTypes)((int)type + 1))
-                            {
-                                if (type == jsonIt["type"].asInt())
-                                {
-                                    std::pair<sf::Vector2f, ItemTypes> it = {
-                                        sf::Vector2f(jsonIt["coord"]["x"].asInt(),jsonIt["coord"]["y"].asInt()),
-                                        type
-                                    };
-                                    chunk->listItems.push_back(it);
-                                }
-                            }
-                        }
-                    }
-
-                    for (Json::Value jsonBlock : jsonChunk["chunk"])
-                    {
-                        Case* block = new Case(50);
-
-                        for (CaseTypes type = GRASS; type != NONE; type = (CaseTypes)((int)type + 1))
-                        {
-                            if ((int)type == jsonBlock.asInt())
-                            {
-                                block->case_type = (CaseTypes)type;
-                            }
-                        }
-
-                        chunk->chunk.push_back(block);
-                    }
-
-                    map.push_back(chunk);
+                    map.push_back(this->LoadJsonChunk(jsonChunk, sf::Vector2f(x, y)));
                 }
             }
 
@@ -108,6 +54,65 @@ std::vector<Chunk*> JsonMapReader::getMap()
     }
 
     return map;
+}
+
+Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
+{
+    Chunk* chunk = new Chunk();
+    chunk->position = postion;
+
+    for (Json::Value jsonEn : jsonChunk["enemies"])
+    {
+        if (jsonEn["coord"] && jsonEn["coord"]["x"] && jsonEn["coord"]["y"] && jsonEn["type"])
+        {
+            for (EnemiTypes type = EnemiTypes::GOBLIN; type != EnemiTypes::ENIMIE_NONE; type = (EnemiTypes)((int)type + 1))
+            {
+                if (type == jsonEn["type"].asInt())
+                {
+                    std::pair<sf::Vector2f, EnemiTypes> en = {
+                        sf::Vector2f(jsonEn["coord"]["x"].asInt() * 50,jsonEn["coord"]["y"].asInt() * 50),
+                        type
+                    };
+                    chunk->listEnemies.push_back(en);
+                }
+            }
+        }
+    }
+
+    for (Json::Value jsonIt : jsonChunk["items"])
+    {
+        if (jsonIt["coord"] && jsonIt["coord"]["x"] && jsonIt["coord"]["y"] && jsonIt["type"])
+        {
+            for (ItemTypes type = ItemTypes::SWORD; type != ItemTypes::ITEM_NONE; type = (ItemTypes)((int)type + 1))
+            {
+                if (type == jsonIt["type"].asInt())
+                {
+                    std::pair<sf::Vector2f, ItemTypes> it = {
+                        sf::Vector2f(jsonIt["coord"]["x"].asInt() * 50,jsonIt["coord"]["y"].asInt() * 50),
+                        type
+                    };
+                    chunk->listItems.push_back(it);
+                }
+            }
+        }
+    }
+
+    for (Json::Value jsonBlock : jsonChunk["chunk"])
+    {
+        Case* block = new Case(50);
+
+        for (CaseTypes type = CaseTypes::GRASS; type != CaseTypes::NONE; type = (CaseTypes)((int)type + 1))
+        {
+            if ((int)type == jsonBlock.asInt())
+            {
+                block->case_type = (CaseTypes)type;
+            }
+        }
+
+        chunk->chunk.push_back(block);
+    }
+
+    return chunk;
 }
 
 std::vector<Case*> JsonMapReader::getChunk(sf::Vector2f position)
@@ -121,18 +126,7 @@ std::vector<Case*> JsonMapReader::getChunk(sf::Vector2f position)
             {
                 if (jsonChunk["chunk"].size() == 100)
                 {
-                    for (Json::Value jsonBlock : jsonChunk["chunk"])
-                    {
-                        Case* block = new Case(50);
-                        for (CaseTypes type = GRASS; type != NONE; type = (CaseTypes)((int)type + 1))
-                        {
-                            if ((int)type == jsonBlock.asInt())
-                            {
-                                block->case_type = (CaseTypes)type;
-                            }
-                        }
-                        cases.push_back(block);
-                    }
+                    cases = this->LoadJsonChunk(jsonChunk, position)->chunk;
                 }
             }
         }
@@ -227,6 +221,32 @@ void JsonMapReader::setupTextures()
             }
         }
 
+        if (this->map["textures"]["player"])
+        {
+            int size = this->map["textures"]["player"].size();
+            int i = 0;
+            for (Json::Value texture : this->map["textures"]["player"])
+            {
+                if (texture["id"] && texture["value"])
+                {
+                    sf::Image image;
+                    if (image.loadFromFile((texture["value"].asString())))
+                    {
+                        image.flipVertically();
+                        sf::Texture* player = new sf::Texture();
+                        if (player->loadFromImage(image))
+                        {
+                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),player };
+                            this->players_textures.push_back(p);
+                        }
+                    }
+
+                }
+                i++;
+                LOG() << "[texture player] " << i << "/" << size;
+            }
+        }
+
         if (this->map["textures"]["items"])
         {
             int size = this->map["textures"]["items"].size();
@@ -243,7 +263,7 @@ void JsonMapReader::setupTextures()
                         if (enim->loadFromImage(image))
                         {
                             std::pair<int, sf::Texture*> p = { texture["id"].asInt(),enim };
-                            this->enemies_textures.push_back(p);
+                            this->items_textures.push_back(p);
                         }
                     }
 

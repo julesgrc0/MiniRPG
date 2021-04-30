@@ -5,7 +5,7 @@
 Player::Player()
 {
 }
-void Player::Draw(sf::RenderWindow &window)
+void Player::Draw(sf::RenderWindow &window,GameTexture& textures)
 {
     sf::CircleShape circ;
     circ.setFillColor(sf::Color::Black);
@@ -14,7 +14,7 @@ void Player::Draw(sf::RenderWindow &window)
     window.draw(circ);
 }
 
-void Player::Draw(sf::RenderTexture &texture)
+void Player::Draw(sf::RenderTexture &texture,GameTexture& textures)
 {
     sf::CircleShape circ;
     circ.setFillColor(sf::Color::Black);
@@ -40,7 +40,7 @@ bool Player::isCollisionBlock(CaseTypes& type)
 {
     for (CaseTypes Itemtype : this->collisions)
     {
-        if (Itemtype == type)
+        if (type == Itemtype)
         {
             return true;
         }

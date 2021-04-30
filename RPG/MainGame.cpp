@@ -6,9 +6,9 @@
 #include <Windows.h>
 
 #include "MainGame.h"
-#include "MapReader.h"
 #include "Log.h"
 #include "Utils.h"
+
 
 MainGame::MainGame()
 {
@@ -27,7 +27,6 @@ MainGame::MainGame()
         HasError = true;
         errorValue = "[ERROR] Fail to load map.json file.";
     }
-   
 }
 
 MainGame::~MainGame()
@@ -37,7 +36,13 @@ MainGame::~MainGame()
 
 void MainGame::Run()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 500), "", sf::Style::Close);
+    sf::ContextSettings settings;
+    settings.depthBits = 24;
+    settings.stencilBits = 8;
+    settings.antialiasingLevel = 4;
+    settings.majorVersion = 3;
+    settings.minorVersion = 0;
+    sf::RenderWindow window(sf::VideoMode(800, 500), "", sf::Style::Close, settings);
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(0);
     //window.setMouseCursorVisible(false);
@@ -78,6 +83,7 @@ void MainGame::Run()
              textures.block_textures = reader.block_textures;
              textures.enemies_textures = reader.enemies_textures;
              textures.items_textures = reader.items_textures;
+             textures.players_textures = reader.players_textures;
          }
          mapReady = true;
          chunkChangeAnimation = 0.0f;
@@ -189,7 +195,7 @@ void MainGame::Run()
                 {
                     gameTexture.clear();
                     activeChunk->Draw(gameTexture, textures);
-                    this->player.Draw(gameTexture);
+                    this->player.Draw(gameTexture, textures);
                     this->mouse.Draw(gameTexture);
                     sf::RectangleShape blur;
                     int gradien = 255 - (int)((255 * chunkChangeAnimation * (100 / chunkAnimationDuration)) / 100);
@@ -223,20 +229,20 @@ void MainGame::Run()
             {
                 if (keyboardUpdate || mouseUpdate.hasMove || endAnimation)
                 {
+
                     gameTexture.clear();
 
                     activeChunk->Draw(gameTexture, textures);
 
                     if (mapReady)
                     {
-                        this->player.Draw(gameTexture);
+                        this->player.Draw(gameTexture, textures);
                         if (mouseUpdate.isOnMap)
                         {
                             this->mouse.Draw(gameTexture);
                             // LOG() << "[mouse active] " << (int)getCaseByPosition(activeChunk->chunk, sf::Vector2f(mouseUpdate.coord.x / 50, mouseUpdate.coord.y / 50))->type;
                         }
                     }
-                   
 
                     gameTexture.display();
 
@@ -250,28 +256,32 @@ void MainGame::Run()
                     gameSprite.setPosition(sf::Vector2f(0, 0));
                     window.draw(gameSprite);
 
-                    if (this->isFontReady)
-                    {
-                        sf::Text t;
-                        t.setFont(font);
-                        if (!mapReady)
-                        {
-                            t.setString("Chargement de la carte... ");
-                        }else
-                        {
-                            t.setString("(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")");
-                        }
-                        
 
-                        t.setCharacterSize(14);
-                        t.setPosition(sf::Vector2f(10, 10));
-                        window.draw(t);
+                    if (!mapReady)
+                    {
+                        this->DrawText(window, "Chargement de la carte... ", sf::Vector2f(10, 10));
+                    }
+                    else
+                    {
+                        this->DrawText(window, "(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")", sf::Vector2f(10, 10));
                     }
 
                     window.display();
-
                 }
             }
         }
+    }
+}
+
+void MainGame::DrawText(sf::RenderWindow& window,sf::String text,sf::Vector2f pos)
+{
+    if (this->isFontReady)
+    {
+        sf::Text t;
+        t.setFont(font);
+        t.setString(text);
+        t.setCharacterSize(14);
+        t.setPosition(pos);
+        window.draw(t);
     }
 }
