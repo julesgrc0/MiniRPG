@@ -24,6 +24,9 @@ private:
 	
 	bool HasError = false;
 	bool isFontReady = false;
+
+	const float chunkAnimationDuration = 20.0f;
+	const int gameTimeSwitch = 60 * 2;
 	
-	
+	void DrawNightFilter(sf::RenderTexture&,sf::Vector2u, int gameTime);
 };

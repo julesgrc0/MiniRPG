@@ -14,23 +14,31 @@
         "player":[
             {
                 "id":0,
-                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_07.png"
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/static_l.png"
             },
             {
                 "id":1,
-                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_09.png"
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/static_r.png"
             },
             {
-                "id":10,
-                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_08.png"
+                "id":2,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/attack_l.png"
             },
             {
-                "id":7,
-                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_15.png"
+                "id":3,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/attack_r.png"
             },
             {
-                "id":6,
-                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/player_11.png"
+                "id":4,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/defend_r.png"
+            },
+            {
+                "id":5,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/defend_l.png"
+            },
+            {
+                "id":9,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/water.png"
             }
         ],
         "items":[]

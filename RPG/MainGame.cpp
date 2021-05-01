@@ -46,21 +46,24 @@ void MainGame::Run()
     bool chunkChange = false;
     bool endAnimation = false;
     bool mapReady = false;
+    bool isNight = false;
 
-    const float chunkAnimationDuration = 20.0f;
+
     float chunkChangeAnimation = chunkAnimationDuration;
     float deltatime = 0;
     int frames = 0;
+    float gameTime = 0.0f;
 
     time_t start = time(0);
     time_t current = time(0);
 
     sf::Clock clock;
     sf::Event event;
+    sf::RenderTexture gameTexture;
+    std::vector<Chunk*> map;
+
     Chunk *activeChunk = new Chunk();
     MouseUpdate mouseUpdate;
-    std::vector<Chunk*> map;
-    sf::RenderTexture gameTexture;
     GameTexture textures = GameTexture();
 
     this->player.playerPos = sf::Vector2f(4, 4);
@@ -141,6 +144,7 @@ void MainGame::Run()
         }else
         {
             deltatime = clock.restart().asSeconds();
+            gameTime += deltatime;
 
             frames++;
             current = time(0);
@@ -168,12 +172,21 @@ void MainGame::Run()
 
                 mouseUpdate = this->mouse.Update(window);
 
+                /*
                 for (int i = 0; i < activeChunk->chunk.size(); i++)
                 {
                     activeChunk->chunk[i]->Update(deltatime);
                 }
+                */
             }
-           
+
+            if (gameTime >= gameTimeSwitch)
+            {
+                gameTime = 0.0f;
+                LOG() << "[time] day night cycle";
+                isNight = !isNight;
+                keyboardUpdate = true;
+            }
 
             if (chunkChange || chunkChangeAnimation < chunkAnimationDuration)
             {
@@ -208,6 +221,11 @@ void MainGame::Run()
                     blur.setPosition(sf::Vector2f(0, 0));
                     blur.setSize(sf::Vector2f(window.getSize()));
                     gameTexture.draw(blur);
+
+                    if (isNight)
+                    {
+                        this->DrawNightFilter(gameTexture, window.getSize(), gameTime);
+                    }
 
                     gameTexture.display();
 
@@ -250,6 +268,11 @@ void MainGame::Run()
                         }
                     }
 
+                    if (isNight)
+                    {
+                        this->DrawNightFilter(gameTexture, window.getSize(),gameTime);
+                    }
+
                     gameTexture.display();
 
                     endAnimation = false;
@@ -280,6 +303,16 @@ void MainGame::Run()
 
     delete activeChunk;
     map.clear();
+}
+
+void MainGame::DrawNightFilter(sf::RenderTexture& gameTexture,sf::Vector2u size,int gameTime)
+{
+    int gradien = 120 - (int)((120 * gameTime * (100 / this->gameTimeSwitch)) / 100);
+    sf::RectangleShape filter;
+    filter.setFillColor(sf::Color(0, 0, 90, gradien));
+    filter.setPosition(sf::Vector2f(0, 0));
+    filter.setSize(sf::Vector2f(size));
+    gameTexture.draw(filter);
 }
 
 void MainGame::DrawText(sf::RenderWindow& window,sf::String text,sf::Vector2f pos)

@@ -5,16 +5,20 @@
 
 enum PlayerStates
 {
-	STATIC_L,
 	STATIC_R,
+	STATIC_L,
+	
+	
+	S_ATTACK_R,
+	S_ATTACK_L,
+	
+
+	S_DEFEND_R,
+	S_DEFEND_L,
 	
 
 	S_N_ATTACK,
-	S_ATTACK_1,
-	S_ATTACK_2,
-	S_ATTACK_3,
-	S_ATTACK,
-	S_DEFEND,
+
 	S_LIGHT,
 	S_BAG,
 	S_WATER,

@@ -117,13 +117,27 @@ bool Player::KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk)
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
-            this->activeState = S_ATTACK;
+            if (isDirectionR)
+            {
+                this->activeState = S_ATTACK_L;
+            }else
+            {
+                this->activeState = S_ATTACK_R;
+            }
+           
             playerSeep = this->Max_player_speed - 2;
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         {
-            this->activeState = S_DEFEND;
+            if (isDirectionR)
+            {
+                this->activeState = S_DEFEND_L;
+            }
+            else
+            {
+                this->activeState = S_DEFEND_R;
+            }
             playerSeep = 2;
         }
     }
