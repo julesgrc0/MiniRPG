@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="Case.cpp" />
     <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameTexture.cpp" />
     <ClCompile Include="JsonMapReader.cpp" />
     <ClCompile Include="main.cpp" />
@@ -151,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="Case.h" />
     <ClInclude Include="Chunk.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameTexture.h" />
     <ClInclude Include="JsonMapReader.h" />
     <ClInclude Include="Log.h" />

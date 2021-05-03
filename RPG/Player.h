@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include"JsonMapReader.h"
 #include "GameTexture.h"
+#include "Utils.h"
 
 class Player
 {
@@ -23,6 +24,7 @@ public:
 	sf::Vector2f playerPos;
 	bool isDirectionR = false;
 	bool isCTRL = false;
+	int life = 100;
 
 	PlayerStates activeState = STATIC_L;
 private:

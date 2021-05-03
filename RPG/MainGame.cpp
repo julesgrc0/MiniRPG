@@ -16,7 +16,7 @@ MainGame::MainGame()
     GetModuleFileNameA(NULL, EXE_FOLDER, std::ios::binary);
     std::string pfont = std::string(EXE_FOLDER) + "\\assets\\Fonts\\Arial\\arial.ttf";
     std::string pmap = std::string(EXE_FOLDER) + "\\assets\\Maps\\map.json";
-    delete EXE_FOLDER;
+    delete[] EXE_FOLDER;
 
     if (this->font.loadFromFile(pfont))
     {
@@ -46,7 +46,6 @@ void MainGame::Run()
     bool chunkChange = false;
     bool endAnimation = false;
     bool mapReady = false;
-    bool isNight = false;
 
 
     float chunkChangeAnimation = chunkAnimationDuration;
@@ -78,7 +77,7 @@ void MainGame::Run()
 
     std::thread([&] {
         activeChunk->chunk = this->reader.getChunk(activeChunk->position);
-     }).detach();
+        }).detach();
     
     std::thread([&] {
          while(!reader.isTexturesLoad) {}
@@ -160,6 +159,14 @@ void MainGame::Run()
                 start = time(0);
             }
 
+            if (gameTime >= gameTimeSwitch)
+            {
+                gameTime = 0.0f;
+                LOG() << "[time] day night cycle";
+                isNight = !isNight;
+                keyboardUpdate = true;
+            }
+
             if (mapReady)
             {
                 keyboardUpdate = this->player.KeyBoardUpdate(deltatime,activeChunk->chunk);
@@ -187,16 +194,12 @@ void MainGame::Run()
                 pO.isCTRL = this->player.isCTRL;
                 pO.position = this->player.playerPos;
                 pO.state = this->player.activeState;
-                chunkUpdate = activeChunk->Update(deltatime, pO);
+                pO.isNight = this->isNight;
+
+                chunkUpdate = activeChunk->Update(deltatime, pO,activeChunk->chunk);
             }
 
-            if (gameTime >= gameTimeSwitch)
-            {
-                gameTime = 0.0f;
-                LOG() << "[time] day night cycle";
-                isNight = !isNight;
-                keyboardUpdate = true;
-            }
+            
 
             if (chunkChange || chunkChangeAnimation < chunkAnimationDuration)
             {
@@ -232,10 +235,7 @@ void MainGame::Run()
                     blur.setSize(sf::Vector2f(window.getSize()));
                     gameTexture.draw(blur);
 
-                    if (isNight)
-                    {
-                        this->DrawNightFilter(gameTexture, window.getSize(), gameTime);
-                    }
+                    this->DrawNightFilter(gameTexture, window.getSize(), gameTime);
 
                     gameTexture.display();
 
@@ -278,10 +278,7 @@ void MainGame::Run()
                         }
                     }
 
-                    if (isNight)
-                    {
-                        this->DrawNightFilter(gameTexture, window.getSize(),gameTime);
-                    }
+                    this->DrawNightFilter(gameTexture, window.getSize(), gameTime);
 
                     gameTexture.display();
 
@@ -317,7 +314,13 @@ void MainGame::Run()
 
 void MainGame::DrawNightFilter(sf::RenderTexture& gameTexture,sf::Vector2u size,int gameTime)
 {
+    
     int gradien = 120 - (int)((120 * gameTime * (100 / this->gameTimeSwitch)) / 100);
+    if (!this->isNight)
+    {
+        gradien =  (int)((120 * gameTime * (100 / this->gameTimeSwitch)) / 100);
+    }
+
     sf::RectangleShape filter;
     filter.setFillColor(sf::Color(0, 0, 90, gradien));
     filter.setPosition(sf::Vector2f(0, 0));

@@ -2,7 +2,69 @@
 #include<iostream>
 #include<vector>
 #include<SFML/Graphics.hpp>
-#include "Chunk.h"
+#include "Case.h"
+#include "Log.h"
+
+enum ItemTypes
+{
+    SWORD,
+    ITEM_NONE
+};
+
+enum EnemiTypes
+{
+    GOBLIN_S,
+    GOBLIN_L,
+    GOBLIN_R,
+    GOBLIN_WATER,
+    ENIMIES_NONE
+};
+
+enum PlayerStates
+{
+    STATIC_R,
+    STATIC_L,
+
+
+    S_ATTACK_R,
+    S_ATTACK_L,
+
+
+    S_DEFEND_R,
+    S_DEFEND_L,
+
+
+    S_N_ATTACK,
+
+    S_LIGHT,
+    S_BAG,
+    S_WATER,
+
+    DEAD,
+};
+
+
+
+struct ChunkUpdate {
+    bool EnemyUpdate = false;
+};
+
+
+struct PlayerObject
+{
+    bool isRight;
+    sf::Vector2f position;
+    bool isCTRL;
+    PlayerStates state;
+    bool isNight;
+};
+
+struct EnemyUpdate
+{
+    bool hasUpdate = false;
+};
+
+
 
 static std::vector<std::string> split(const std::string& txt, char ch)
 {
@@ -22,9 +84,9 @@ static std::vector<std::string> split(const std::string& txt, char ch)
 }
 
 
-static bool isTypeEnemy(EnemiTypes* enemy, EnemiTypes& type)
+static bool isTypeEnemy(EnemiTypes* enemy, EnemiTypes& type,int size)
 {
-    for (size_t i = 0; i < (sizeof(enemy) / sizeof(enemy[0])) + 1; i++)
+    for (size_t i = 0; i < size; i++)
     {
         if (type == enemy[i])
         {
@@ -49,23 +111,31 @@ static sf::Vector2f moveEnemyToPlayer(sf::Vector2f& player, sf::Vector2f& enemy,
 {
     sf::Vector2f m = enemy;
 
-    if (player.x > enemy.x)
+    if (player.x != enemy.x)
     {
-        m.x += move;
-    }
-    else
-    {
-        m.x -= move;
+        if (player.x > enemy.x)
+        {
+            m.x += move;
+        }
+        else
+        {
+            m.x -= move;
+        }
     }
 
-    if (player.y > enemy.y)
+    if (player.y != enemy.y)
     {
-        m.y += move;
+        if (player.y > enemy.y)
+        {
+            m.y += move;
+        }
+        else
+        {
+            m.y -= move;
+        }
     }
-    else
-    {
-        m.y -= move;
-    }
+
+    
 
     return m;
 }

@@ -70,11 +70,10 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
             {
                 if (type == jsonEn["type"].asInt())
                 {
-                    std::pair<sf::Vector2f, EnemiTypes> en = {
-                        sf::Vector2f(jsonEn["coord"]["x"].asInt() * 50,jsonEn["coord"]["y"].asInt() * 50),
-                        type
-                    };
-                    chunk->listEnemies.push_back(en);
+                    Enemy* enemy = new Enemy();
+                    enemy->type = type;
+                    enemy->position = sf::Vector2f(jsonEn["coord"]["x"].asInt() * 50, jsonEn["coord"]["y"].asInt() * 50);
+                    chunk->listEnemies.push_back(enemy);
                 }
             }
         }
