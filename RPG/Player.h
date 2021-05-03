@@ -3,29 +3,6 @@
 #include"JsonMapReader.h"
 #include "GameTexture.h"
 
-enum PlayerStates
-{
-	STATIC_R,
-	STATIC_L,
-	
-	
-	S_ATTACK_R,
-	S_ATTACK_L,
-	
-
-	S_DEFEND_R,
-	S_DEFEND_L,
-	
-
-	S_N_ATTACK,
-
-	S_LIGHT,
-	S_BAG,
-	S_WATER,
-
-	DEAD,
-};
-
 class Player
 {
 public:
@@ -44,7 +21,10 @@ public:
 	void goForward();
 
 	sf::Vector2f playerPos;
-	
+	bool isDirectionR = false;
+	bool isCTRL = false;
+
+	PlayerStates activeState = STATIC_L;
 private:
 	const CaseTypes collisions[8] = {
 		CASTLE_WALL_L,
@@ -59,11 +39,8 @@ private:
 	
 	sf::Vector2f lastPos;
 
-	PlayerStates activeState = STATIC_L;
-
 	bool getTexture(PlayerStates, GameTexture&, sf::Texture*&);
 
-	bool isDirectionR = false;
 	bool isNew = false;
 	const int Max_player_speed = 5;
 	int playerSeep = Max_player_speed;
@@ -72,5 +49,5 @@ private:
 	bool isAnimationActive = false;
 
 	std::vector<sf::Vector2f> visitedChunks;
-	std::vector<Case*> getChunk(std::vector<Chunk*>& ,sf::Vector2f);
+	Chunk* getChunk(std::vector<Chunk*>& ,sf::Vector2f);
 };

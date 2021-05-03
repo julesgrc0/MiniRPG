@@ -66,7 +66,7 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
     {
         if (jsonEn["coord"] && jsonEn["coord"]["x"] && jsonEn["coord"]["y"] && jsonEn["type"])
         {
-            for (EnemiTypes type = EnemiTypes::GOBLIN; type != EnemiTypes::ENIMIE_NONE; type = (EnemiTypes)((int)type + 1))
+            for (EnemiTypes type = EnemiTypes::GOBLIN_S; type != EnemiTypes::ENIMIES_NONE; type = (EnemiTypes)((int)type + 1))
             {
                 if (type == jsonEn["type"].asInt())
                 {
@@ -182,7 +182,7 @@ void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vec
                 sf::Image image;
                 if (image.loadFromFile((texture["value"].asString())))
                 {
-                    if (type != "player")
+                    if (type != "player" && type != "enemies")
                     {
                         image.flipVertically();
                     }

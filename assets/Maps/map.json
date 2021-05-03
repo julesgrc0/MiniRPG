@@ -10,7 +10,20 @@
             "value":"C:/Users/jules/source/repos/RPG/assets/Images/blocks/ground_grass_b.png"
 		}
 		],
-        "enemies": [],
+        "enemies": [
+            {
+                "id":0,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/enemies/enemy_static.png"
+            },
+            {
+                "id":1,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/enemies/enemy_l.png"
+            },
+            {
+                "id":2,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/enemies/enemy_r.png"
+            }
+        ],
         "player":[
             {
                 "id":0,
@@ -273,8 +286,8 @@
                 {
                     "coord":
                     {
-                        "x":1,
-                        "y":1
+                        "x":5,
+                        "y":5
                     },
                     "type":0
                 }

@@ -2,6 +2,7 @@
 #include<iostream>
 #include<vector>
 #include<SFML/Graphics.hpp>
+#include "Chunk.h"
 
 static std::vector<std::string> split(const std::string& txt, char ch)
 {
@@ -20,6 +21,54 @@ static std::vector<std::string> split(const std::string& txt, char ch)
     return strs;
 }
 
+
+static bool isTypeEnemy(EnemiTypes* enemy, EnemiTypes& type)
+{
+    for (size_t i = 0; i < (sizeof(enemy) / sizeof(enemy[0])) + 1; i++)
+    {
+        if (type == enemy[i])
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static bool isPlayerAround(sf::Vector2f& player, sf::Vector2f& enemy, int r)
+{
+    int dist = sqrt(pow(player.x - enemy.x, 2) + pow(player.y - enemy.y, 2));
+    if (dist < r)
+    {
+        return true;
+    }
+    return false;
+}
+
+static sf::Vector2f moveEnemyToPlayer(sf::Vector2f& player, sf::Vector2f& enemy, float move)
+{
+    sf::Vector2f m = enemy;
+
+    if (player.x > enemy.x)
+    {
+        m.x += move;
+    }
+    else
+    {
+        m.x -= move;
+    }
+
+    if (player.y > enemy.y)
+    {
+        m.y += move;
+    }
+    else
+    {
+        m.y -= move;
+    }
+
+    return m;
+}
 
 static bool getTexture(std::vector<std::pair<int,sf::Texture*>> textures, int index, sf::Texture*& texture)
 {

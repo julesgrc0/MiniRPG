@@ -64,6 +64,7 @@ void MainGame::Run()
 
     Chunk *activeChunk = new Chunk();
     MouseUpdate mouseUpdate;
+    ChunkUpdate chunkUpdate;
     GameTexture textures = GameTexture();
 
     this->player.playerPos = sf::Vector2f(4, 4);
@@ -90,8 +91,11 @@ void MainGame::Run()
          }else
          {
              textures.block_textures = reader.block_textures;
+             
              textures.enemies_textures = reader.enemies_textures;
+             
              textures.items_textures = reader.items_textures;
+
              textures.players_textures = reader.players_textures;
          }
          mapReady = true;
@@ -178,6 +182,12 @@ void MainGame::Run()
                     activeChunk->chunk[i]->Update(deltatime);
                 }
                 */
+                PlayerObject pO;
+                pO.isRight = this->player.isDirectionR;
+                pO.isCTRL = this->player.isCTRL;
+                pO.position = this->player.playerPos;
+                pO.state = this->player.activeState;
+                chunkUpdate = activeChunk->Update(deltatime, pO);
             }
 
             if (gameTime >= gameTimeSwitch)
@@ -244,7 +254,7 @@ void MainGame::Run()
             }
             else
             {
-                if (keyboardUpdate || mouseUpdate.hasMove || endAnimation)
+                if (keyboardUpdate || mouseUpdate.hasMove || endAnimation || chunkUpdate.EnemyUpdate)
                 {
 
                     gameTexture.clear();

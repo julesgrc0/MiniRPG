@@ -106,9 +106,11 @@ bool Player::KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
     {
         playerSeep = 2;
+        this->isCTRL = true;
     }
     else
     {
+        this->isCTRL = false;
         this->playerSeep = this->Max_player_speed;
     }
 
@@ -199,17 +201,20 @@ bool Player::isNewChunk()
     }
 }
 
-std::vector<Case*> Player::getChunk(std::vector<Chunk*>& chunks,sf::Vector2f position)
+Chunk* Player::getChunk(std::vector<Chunk*>& chunks,sf::Vector2f position)
 {
-    for (Chunk* chunk : chunks)
+    Chunk* chunk = new Chunk();
+    for (Chunk* c : chunks)
     {
-        if (chunk->position == position)
+        if (c->position == position)
         {
-            return chunk->chunk;
+            chunk->chunk = c->chunk;
+            chunk->listEnemies = c->listEnemies;
+            chunk->listItems = c->listItems;
+            break;
         }
     }
-    std::vector<Case*> cases;
-    return cases;
+    return chunk;
 }
 
 bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& activeChunk)
@@ -227,13 +232,15 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.x++;
-        std::vector<Case*> c = this->getChunk(chunks,next);
-        if (c.size() > 0)
+        Chunk* c = this->getChunk(chunks, next);
+        if (c->chunk.size() > 0)
         {
             this->playerPos.x -= 9.5;
             this->playerPos.x += playerSeep * deltatime;
 
-            activeChunk->chunk = c;
+            activeChunk->chunk = c->chunk;
+            activeChunk->listEnemies = c->listEnemies;
+            activeChunk->listItems = c->listItems;
             activeChunk->position = next;
             chunkChange = true;
         }
@@ -246,13 +253,15 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.x--;
-        std::vector<Case*> c = this->getChunk(chunks, next);
-        if (c.size() > 0)
+        Chunk* c = this->getChunk(chunks, next);
+        if (c->chunk.size() > 0)
         {
             this->playerPos.x += 9.5;
             this->playerPos.x -= playerSeep * deltatime;
 
-            activeChunk->chunk = c;
+            activeChunk->chunk = c->chunk;
+            activeChunk->listEnemies = c->listEnemies;
+            activeChunk->listItems = c->listItems;
             activeChunk->position = next;
             chunkChange = true;
         }
@@ -266,13 +275,15 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.y++;
-        std::vector<Case*> c = this->getChunk(chunks, next);
-        if (c.size() > 0)
+        Chunk* c = this->getChunk(chunks, next);
+        if (c->chunk.size() > 0)
         {
             this->playerPos.y -= 9.5;
             this->playerPos.y += playerSeep * deltatime;
 
-            activeChunk->chunk = c;
+            activeChunk->chunk = c->chunk;
+            activeChunk->listEnemies = c->listEnemies;
+            activeChunk->listItems = c->listItems;
             activeChunk->position = next;
             chunkChange = true;
         }
@@ -285,13 +296,15 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.y--;
-        std::vector<Case*> c = this->getChunk(chunks, next);
-        if (c.size() > 0)
+        Chunk* c = this->getChunk(chunks, next);
+        if (c->chunk.size() > 0)
         {
             this->playerPos.y += 9.5;
             this->playerPos.y -= playerSeep * deltatime;
 
-            activeChunk->chunk = c;
+            activeChunk->chunk = c->chunk;
+            activeChunk->listEnemies = c->listEnemies;
+            activeChunk->listItems = c->listItems;
             activeChunk->position = next;
             chunkChange = true;
         }
