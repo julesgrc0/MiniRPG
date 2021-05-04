@@ -8,6 +8,9 @@
 enum ItemTypes
 {
     SWORD,
+    WOOD,
+    IRON,
+    WATER_BUCKET,
     ITEM_NONE
 };
 
@@ -43,10 +46,10 @@ enum PlayerStates
     DEAD,
 };
 
-
-
 struct ChunkUpdate {
     bool EnemyUpdate = false;
+    bool ItemUpdate = false;
+    std::vector<std::pair<ItemTypes,sf::Vector2f>> ItemsCollect;
 };
 
 
@@ -64,7 +67,10 @@ struct EnemyUpdate
     bool hasUpdate = false;
 };
 
-
+struct ItemUpdate {
+    bool hasUpdate = false;
+    ItemTypes type;
+};
 
 static std::vector<std::string> split(const std::string& txt, char ch)
 {
@@ -99,7 +105,7 @@ static bool isTypeEnemy(EnemiTypes* enemy, EnemiTypes& type,int size)
 
 static bool isPlayerAround(sf::Vector2f& player, sf::Vector2f& enemy, int r)
 {
-    int dist = sqrt(pow(player.x - enemy.x, 2) + pow(player.y - enemy.y, 2));
+    int dist = (int)sqrt(pow(player.x - enemy.x, 2) + pow(player.y - enemy.y, 2));
     if (dist < r)
     {
         return true;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "JsonMapReader.h"
 #include<thread>
+#include "Item.h"
 #include "Log.h"
 #include "Utils.h"
 
@@ -87,11 +88,10 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
             {
                 if (type == jsonIt["type"].asInt())
                 {
-                    std::pair<sf::Vector2f, ItemTypes> it = {
-                        sf::Vector2f(jsonIt["coord"]["x"].asInt() * 50,jsonIt["coord"]["y"].asInt() * 50),
-                        type
-                    };
-                    chunk->listItems.push_back(it);
+                    Item* item = new Item();
+                    item->position = sf::Vector2f(jsonIt["coord"]["x"].asInt() * 50, jsonIt["coord"]["y"].asInt() * 50);
+                    item->type = type;
+                    chunk->listItems.push_back(item);
                 }
             }
         }
@@ -181,7 +181,7 @@ void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vec
                 sf::Image image;
                 if (image.loadFromFile((texture["value"].asString())))
                 {
-                    if (type != "player" && type != "enemies")
+                    if (type != "player" && type != "enemies" && type != "items")
                     {
                         image.flipVertically();
                     }

@@ -4,6 +4,7 @@
 #include "GameTexture.h"
 #include "Utils.h"
 #include "Enemy.h"
+#include "Item.h"
 
 class Chunk
 {
@@ -19,7 +20,7 @@ public:
 	ChunkUpdate Update(float deltatime, PlayerObject& player,std::vector<Case*>&);
 
 	std::vector<Enemy*> listEnemies;
-	std::vector<std::pair<sf::Vector2f, ItemTypes>> listItems;
+	std::vector<Item*> listItems;
 	Chunk& operator = (const Chunk*& chunk);
 public:
 	float chunkTime;

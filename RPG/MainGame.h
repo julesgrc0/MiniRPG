@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Mouse.h"
 #include "JsonMapReader.h"
+#include "HUD.h"
 
 class MainGame
 {
@@ -24,7 +25,7 @@ private:
 	
 	bool HasError = false;
 	bool isFontReady = false;
-	bool isNight = true;
+	bool isNight = false;
 
 	const float chunkAnimationDuration = 20.0f;
 	const int gameTimeSwitch = 60 * 2;

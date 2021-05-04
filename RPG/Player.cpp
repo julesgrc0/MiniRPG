@@ -4,6 +4,10 @@
 
 Player::Player()
 {
+    for (size_t i = 0; i < 8; i++)
+    {
+        this->activeBar[i] = WOOD;// ITEM_NONE;
+    }
 }
 void Player::Draw(sf::RenderWindow& window, GameTexture& textures)
 {
@@ -112,6 +116,9 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk)
                      chunk->listEnemies[i]->life -= 1;
                      if (chunk->listEnemies[i]->life < 0)
                      {
+                         this->kill++;
+                         std::vector<Item*> items = chunk->listEnemies[i]->DropItems();
+                         chunk->listItems.insert(chunk->listItems.end(), items.begin(), items.end());
                          eraselist.push_back(i);
                      }
                  }
@@ -159,6 +166,21 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk)
              }
          }
          break;
+         }
+     }
+
+     if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+     {
+         rCTRLpressTime += deltatime;
+         if (rCTRLpressTime >= 0.15)
+         {
+             this->HUDbarIndex++;
+             if (this->HUDbarIndex > 7)
+             {
+                 this->HUDbarIndex = 0;
+             }
+             update.hasUpdate = true;
+             rCTRLpressTime = 0.0f;
          }
      }
 

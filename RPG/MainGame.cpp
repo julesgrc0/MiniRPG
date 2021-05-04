@@ -23,6 +23,7 @@ MainGame::MainGame()
         isFontReady = true;
     }
 
+
     if (!reader.loadMap(pmap))
     {
         HasError = true;
@@ -65,6 +66,7 @@ void MainGame::Run()
     ChunkUpdate chunkUpdate;
     PlayerUpdate playerUpdate;
     GameTexture textures = GameTexture();
+    HUD hud = HUD(this->font);
 
     this->player.playerPos = sf::Vector2f(4, 4);
     activeChunk->position = sf::Vector2f(0, 0);
@@ -180,6 +182,51 @@ void MainGame::Run()
                         pO.isNight = this->isNight;
 
                         chunkUpdate = activeChunk->Update(deltatime, pO, activeChunk->chunk);
+                        
+                        if (chunkUpdate.ItemUpdate && chunkUpdate.ItemsCollect.size() != 0)
+                        {
+                            for (std::pair<ItemTypes, sf::Vector2f>& it : chunkUpdate.ItemsCollect)
+                            {
+                                Item* item = new Item();
+                                item->type = it.first;
+                                item->position = it.second;
+
+                                this->player.inventory.push_back(item);
+                            }
+                            
+                            std::vector<int> removelist;
+                            
+                            for (size_t i = 0; i < activeChunk->listItems.size(); i++)
+                            {
+                                for (std::pair<ItemTypes, sf::Vector2f>& it : chunkUpdate.ItemsCollect)
+                                {
+                                    if (it.second == activeChunk->listItems[i]->position)
+                                    {
+                                        removelist.push_back(i);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (removelist.size() != 0)
+                            {
+                                for (size_t i = 0; i < removelist.size(); i++)
+                                {
+                                    activeChunk->listItems.erase(activeChunk->listItems.begin() + removelist[i] - i);
+                                }
+
+                                int id = getChunkId(map, activeChunk);
+                                map[id]->size = activeChunk->size;
+                                map[id]->listEnemies = activeChunk->listEnemies;
+                                map[id]->listItems = activeChunk->listItems;
+                                map[id]->chunk = activeChunk->chunk;
+                                map[id]->isNight = activeChunk->isNight;
+                                map[id]->position = activeChunk->position;
+                            }
+                            removelist.clear();
+                            chunkUpdate.ItemsCollect.clear();
+                        }
+                        
                         playerUpdate = this->player.KeyBoardUpdate(deltatime, activeChunk);
                         
                         if (playerUpdate.hasChunkUpdate)
@@ -214,6 +261,23 @@ void MainGame::Run()
                             activeChunk->chunk[i]->Update(deltatime);
                         }
                         */
+
+                        HUDupdateObject hudObj;
+                        hudObj.chunkPos = activeChunk->position;
+                        hudObj.playerPos = this->player.playerPos;
+                        hudObj.enemiesCount = activeChunk->listEnemies.size();
+                        hudObj.inventoryItemsCount = this->player.inventory.size();
+                        hudObj.activeBarIndex = this->player.HUDbarIndex;
+                        hudObj.playerLife = this->player.life;
+                        hudObj.playerXP = this->player.xp;
+                        hudObj.playerKill = this->player.kill;
+                        hudObj.deltatime = deltatime;
+                        hudObj.night = (gameTime * 100 / this->gameTimeSwitch);
+                        for (size_t i = 0; i < 8; i++)
+                        {
+                            hudObj.activeBar[i] = this->player.activeBar[i];
+                        }
+                        hud.Update(hudObj);
                     }
 
 
@@ -261,6 +325,8 @@ void MainGame::Run()
                             gameSprite.setPosition(sf::Vector2f(0, 0));
                             window.draw(gameSprite);
 
+                            hud.Draw(window, gameSprite, textures);
+
                             if (this->isFontReady)
                             {
                                 this->DrawText(window, "(" + std::to_string((int)activeChunk->position.x) + ";" + std::to_string((int)activeChunk->position.y) + ")", sf::Vector2f(10, 10));
@@ -271,7 +337,7 @@ void MainGame::Run()
                     }
                     else
                     {
-                        if (playerUpdate.hasUpdate || mouseUpdate.hasMove || endAnimation || chunkUpdate.EnemyUpdate)
+                        if (playerUpdate.hasUpdate || mouseUpdate.hasMove || endAnimation || chunkUpdate.EnemyUpdate || chunkUpdate.ItemUpdate)
                         {
 
                             gameTexture.clear();
@@ -310,6 +376,7 @@ void MainGame::Run()
                             gameSprite.setPosition(sf::Vector2f(0, 0));
                             window.draw(gameSprite);
 
+                            hud.Draw(window, gameSprite, textures);
 
                             if (!mapReady)
                             {
@@ -349,7 +416,7 @@ void MainGame::DrawNightFilter(sf::RenderTexture& gameTexture, sf::Vector2u size
 int MainGame::getChunkId(std::vector<Chunk*>& map, Chunk*& chunk)
 {
     std::vector<Chunk*> chunks = map;
-    for (size_t i = 0; i < map.size(); i++)
+    for (int i = 0; i < map.size(); i++)
     {
         if (map[i]->position == chunk->position)
         {

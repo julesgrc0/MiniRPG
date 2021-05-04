@@ -46,12 +46,21 @@ void Chunk::Draw(sf::RenderTexture& texture, GameTexture& textures)
             p->Draw(texture, textures);
         }
     }
+
+    if (this->listItems.size() != 0)
+    {
+        for (Item* it : this->listItems)
+        {
+            it->Draw(texture, textures);
+        }
+    }
 }
 
 ChunkUpdate Chunk::Update(float deltatime, PlayerObject& player,std::vector<Case*>& cases)
 {
     this->isNight = player.isNight;
     ChunkUpdate update;
+
     if (this->listEnemies.size() != 0 && this->isNight)
     {
         for (Enemy* p : this->listEnemies)
@@ -59,6 +68,19 @@ ChunkUpdate Chunk::Update(float deltatime, PlayerObject& player,std::vector<Case
             if(p->Update(deltatime, player, cases).hasUpdate)
             {
                 update.EnemyUpdate = true;
+            }
+        }
+    }
+
+    if (this->listItems.size() != 0)
+    {
+        for (Item* it : this->listItems)
+        {
+            if (it->Update(deltatime, player).hasUpdate)
+            {
+                update.ItemUpdate = true;
+                std::pair<ItemTypes, sf::Vector2f> col = { it->type,it->position };
+                update.ItemsCollect.push_back(col);
             }
         }
     }

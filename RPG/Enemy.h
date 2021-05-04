@@ -3,16 +3,20 @@
 #include<SFML/Graphics.hpp>
 #include "GameTexture.h"
 #include "Utils.h"
-
+#include "Item.h"
 
 class Enemy
 {
 public:
+	Enemy();
+	~Enemy();
 	EnemiTypes type;
 	sf::Vector2f position;
 
 	void Draw(sf::RenderTexture&, GameTexture&);
 	EnemyUpdate Update(float&, PlayerObject&,std::vector<Case*>&);
+
+	std::vector<Item*> DropItems();
 
 	int life = 100;
 	float damage = 0.5;

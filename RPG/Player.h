@@ -32,8 +32,15 @@ public:
 	bool isDirectionR = false;
 	bool isCTRL = false;
 	int life = 100;
+	int xp = 0;
+	int kill = 0;
+
+	int HUDbarIndex = 0;
 
 	PlayerStates activeState = STATIC_L;
+
+	std::vector<Item*> inventory;
+	ItemTypes activeBar[8];
 private:
 	const CaseTypes collisions[8] = {
 		CASTLE_WALL_L,
@@ -56,6 +63,7 @@ private:
 	int playerXP = 0;
 	float damageTime = 0.0f;
 	float enemiesDmgTime = 0.0f;
+	float rCTRLpressTime = 0.0f;
 	const int damage = 0.3;
 
 	std::vector<sf::Vector2f> visitedChunks;

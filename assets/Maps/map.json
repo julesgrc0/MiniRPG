@@ -58,7 +58,20 @@
                 "value":"C:/Users/jules/source/repos/RPG/assets/Images/player/water.png"
             }
         ],
-        "items":[]
+        "items":[
+            {
+                "id":1,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/items/wood.png"
+            },
+            {
+                "id":2,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/items/iron.png"
+            },
+            {
+                "id":3,
+                "value":"C:/Users/jules/source/repos/RPG/assets/Images/items/water bucket.png"
+            }
+        ]
     },
     "map": [
         {

@@ -119,3 +119,17 @@ EnemyUpdate Enemy::Update(float& deltatime, PlayerObject& player, std::vector<Ca
 
     return update;
 }
+
+std::vector<Item*> Enemy::DropItems()
+{
+    std::vector<Item*> items;
+    Item* item = new Item();
+    item->position = this->position;
+    item->type = ItemTypes::WOOD;
+    items.push_back(item);
+    return items;
+}
+
+Enemy::Enemy(){}
+Enemy::~Enemy(){}
+
