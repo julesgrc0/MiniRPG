@@ -24,10 +24,11 @@ private:
 	
 	bool HasError = false;
 	bool isFontReady = false;
-	bool isNight = false;
+	bool isNight = true;
 
 	const float chunkAnimationDuration = 20.0f;
-	const int gameTimeSwitch = 5;
+	const int gameTimeSwitch = 60 * 2;
 	
 	void DrawNightFilter(sf::RenderTexture&,sf::Vector2u, int gameTime);
+	int getChunkId(std::vector<Chunk*>& map, Chunk*& chunk);
 };

@@ -135,10 +135,23 @@ static sf::Vector2f moveEnemyToPlayer(sf::Vector2f& player, sf::Vector2f& enemy,
         }
     }
 
-    
+   
+    return m;
+}
+
+static sf::Vector2f movePlayerToEnemyDist(sf::Vector2f& player, sf::Vector2f& enemy, float move,int dist)
+{
+    sf::Vector2f m = enemy;
+    sf::Vector2f future = moveEnemyToPlayer(player, enemy, move);
+
+    if (dist < sqrt(pow(player.x - future.x, 2) + pow(player.y - future.y, 2)))
+    {
+        m = future;
+    }
 
     return m;
 }
+
 
 static bool getTexture(std::vector<std::pair<int,sf::Texture*>> textures, int index, sf::Texture*& texture)
 {

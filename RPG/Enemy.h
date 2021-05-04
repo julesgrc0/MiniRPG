@@ -15,6 +15,7 @@ public:
 	EnemyUpdate Update(float&, PlayerObject&,std::vector<Case*>&);
 
 	int life = 100;
+	float damage = 0.5;
 private:
 	int actualDist = 0;
 	float time = 0;

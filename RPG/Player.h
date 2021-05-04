@@ -4,13 +4,20 @@
 #include "GameTexture.h"
 #include "Utils.h"
 
+struct PlayerUpdate
+{
+	bool hasUpdate = false;
+	bool hasChunkUpdate = false;
+	Chunk* chunkUpdate;
+};
+
 class Player
 {
 public:
 	Player();
 	~Player();
 	
-	bool KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk);
+	PlayerUpdate KeyBoardUpdate(float deltatime, Chunk*& chunk);
 	bool MapUpdate(float deltatime,std::vector<Chunk*>&, Chunk*& activeChunk);
 	bool isNewChunk();
 	void addVisitedChunk(sf::Vector2f);
@@ -47,8 +54,9 @@ private:
 	const int Max_player_speed = 5;
 	int playerSeep = Max_player_speed;
 	int playerXP = 0;
-	float animation = 0.0f;
-	bool isAnimationActive = false;
+	float damageTime = 0.0f;
+	float enemiesDmgTime = 0.0f;
+	const int damage = 0.3;
 
 	std::vector<sf::Vector2f> visitedChunks;
 	Chunk* getChunk(std::vector<Chunk*>& ,sf::Vector2f);

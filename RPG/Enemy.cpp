@@ -37,6 +37,21 @@ void Enemy::Draw(sf::RenderTexture& texture, GameTexture& textures)
                 hasTexture = true;
             }
         }
+        
+        sf::RectangleShape lifeRect;
+        lifeRect.setSize(sf::Vector2f(this->size, 8));
+        lifeRect.setPosition(sf::Vector2f(this->position.x, this->position.y - this->size/2));
+        lifeRect.setOutlineColor(sf::Color::Black);
+        lifeRect.setOutlineThickness(1.0f);
+        lifeRect.setFillColor(sf::Color::Transparent);
+        texture.draw(lifeRect);
+
+        sf::RectangleShape lifeFill;
+        lifeFill.setSize(sf::Vector2f(((this->size * life)/100), 8));
+        lifeFill.setPosition(sf::Vector2f(this->position.x, this->position.y - this->size / 2));
+        lifeFill.setFillColor(sf::Color::Red);
+        texture.draw(lifeFill);
+
 
         if (!hasTexture)
         {
@@ -46,7 +61,6 @@ void Enemy::Draw(sf::RenderTexture& texture, GameTexture& textures)
             circ.setPosition(this->position);
             texture.draw(circ);
         }
-
 }
 
 EnemyUpdate Enemy::Update(float& deltatime, PlayerObject& player, std::vector<Case*>& cases)
@@ -63,6 +77,7 @@ EnemyUpdate Enemy::Update(float& deltatime, PlayerObject& player, std::vector<Ca
             {
                 this->actualDist /= 2;
             }
+
             if (isPlayerAround(p, this->position, this->actualDist))
             {
                 if (player.isRight)
@@ -75,7 +90,7 @@ EnemyUpdate Enemy::Update(float& deltatime, PlayerObject& player, std::vector<Ca
                 }
 
                 float move = 100 * deltatime;
-                sf::Vector2f newPos = moveEnemyToPlayer(p, this->position, move);
+                sf::Vector2f newPos = movePlayerToEnemyDist(p, this->position, move,this->size);
                 sf::Vector2f roundPlayer = sf::Vector2f(round(player.position.x), round(player.position.y));
 
                 if (getCaseByPosition(cases, roundPlayer)->case_type != CaseTypes::WATER)

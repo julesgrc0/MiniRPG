@@ -20,6 +20,7 @@ public:
 
 	std::vector<Enemy*> listEnemies;
 	std::vector<std::pair<sf::Vector2f, ItemTypes>> listItems;
+	Chunk& operator = (const Chunk*& chunk);
 public:
 	float chunkTime;
 	bool isNight = false;

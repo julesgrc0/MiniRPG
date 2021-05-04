@@ -30,6 +30,20 @@ void Player::Draw(sf::RenderTexture& texture, GameTexture& textures)
         circ.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
         texture.draw(circ);
     }
+
+    sf::RectangleShape lifeRect;
+    lifeRect.setSize(sf::Vector2f(50, 8));
+    lifeRect.setPosition(sf::Vector2f(this->playerPos.x*50, this->playerPos.y * 50 -  10));
+    lifeRect.setOutlineColor(sf::Color::Black);
+    lifeRect.setOutlineThickness(1.0f);
+    lifeRect.setFillColor(sf::Color::Transparent);
+    texture.draw(lifeRect);
+
+    sf::RectangleShape lifeFill;
+    lifeFill.setSize(sf::Vector2f(((50 * this->life) / 100), 8));
+    lifeFill.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50 - 10));
+    lifeFill.setFillColor(sf::Color::Green);
+    texture.draw(lifeFill);
 }
 
 bool Player::getTexture(PlayerStates state, GameTexture& textures,sf::Texture*& textureItem)
@@ -72,14 +86,59 @@ bool Player::isCollisionBlock(CaseTypes& type)
     return false;
 }
 
-bool Player::KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk)
+PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk)
 {
-    bool keyboardUpdate = false;
+    PlayerUpdate update;
 
      sf::Vector2f lpos = this->playerPos;
 
      sf::Vector2f roundPlayer = sf::Vector2f(round(this->playerPos.x), round(this->playerPos.y));
-     CaseTypes type = getCaseByPosition(chunk, roundPlayer)->case_type;
+     CaseTypes type = getCaseByPosition(chunk->chunk, roundPlayer)->case_type;
+
+
+     sf::Vector2f pO = sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50);
+     std::vector<int> eraselist;
+
+     for (unsigned int i=0;i < chunk->listEnemies.size();i++)
+     {
+         if (isPlayerAround(pO, chunk->listEnemies[i]->position, 50) && (this->activeState != PlayerStates::S_DEFEND_L && this->activeState != PlayerStates::S_DEFEND_R))
+         {
+             if (this->activeState == PlayerStates::S_ATTACK_L || this->activeState == PlayerStates::S_ATTACK_R)
+             {
+                 enemiesDmgTime += deltatime;
+                 if (damageTime > this->damage)
+                 {
+                     enemiesDmgTime = 0.0f;
+                     chunk->listEnemies[i]->life -= 1;
+                     if (chunk->listEnemies[i]->life < 0)
+                     {
+                         eraselist.push_back(i);
+                     }
+                 }
+             }
+
+             damageTime += deltatime;
+             if (damageTime > chunk->listEnemies[i]->damage)
+             {
+                 damageTime = 0.0f;
+                 this->life -= 1;
+             }
+             update.hasUpdate = true;
+         }
+     }
+
+     if (eraselist.size() != 0)
+     {
+         update.hasChunkUpdate = true;
+         
+         for (size_t i = 0; i < eraselist.size(); i++)
+         {
+             chunk->listEnemies.erase(chunk->listEnemies.begin() + eraselist[i] - i);
+         }
+
+         update.chunkUpdate = chunk;
+         eraselist.clear();
+     }
 
      if (type != CaseTypes::NONE)
      {
@@ -147,24 +206,24 @@ bool Player::KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
         this->playerPos.y -= playerSeep * deltatime;
-        keyboardUpdate = true;
+        update.hasUpdate = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
         this->playerPos.y += playerSeep * deltatime;
-        keyboardUpdate = true;
+        update.hasUpdate = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
         this->isDirectionR = true;
         this->playerPos.x -= playerSeep * deltatime;
-        keyboardUpdate = true;
+        update.hasUpdate = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
         this->isDirectionR = false;
         this->playerPos.x += playerSeep * deltatime;
-        keyboardUpdate = true;
+        update.hasUpdate = true;
     }
 
     if ((this->activeState == STATIC_L || this->activeState == STATIC_R))
@@ -180,12 +239,12 @@ bool Player::KeyBoardUpdate(float deltatime, std::vector<Case*>& chunk)
     }
 
 
-    if (keyboardUpdate)
+    if (update.hasUpdate)
     {
         this->lastPos = lpos;
     }
    
-    return keyboardUpdate;
+    return update;
 }
 
 bool Player::isNewChunk()

@@ -17,6 +17,18 @@ void Chunk::Draw(sf::RenderWindow& window, GameTexture& textures)
     }
 }
 
+Chunk& Chunk::operator = (const Chunk*& chunk)
+{
+    this->size = chunk->size;
+    this->listEnemies = chunk->listEnemies;
+    this->listItems = chunk->listItems;
+    this->chunk = chunk->chunk;
+    this->isNight = chunk->isNight;
+    this->position = chunk->position;
+
+    return *this;
+}
+
 void Chunk::Draw(sf::RenderTexture& texture, GameTexture& textures)
 {
     for (int i = 0; i < 100; i += 10)
