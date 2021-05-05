@@ -10,7 +10,7 @@ class MainGame
 public:
 	MainGame();
 	~MainGame();
-	void Run();
+	int Run();
 
 private:
 

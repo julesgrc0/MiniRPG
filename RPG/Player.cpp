@@ -6,7 +6,7 @@ Player::Player()
 {
     for (size_t i = 0; i < 8; i++)
     {
-        this->activeBar[i] = WOOD;// ITEM_NONE;
+        this->activeBar[i] = ITEM_NONE;
     }
 }
 void Player::Draw(sf::RenderWindow& window, GameTexture& textures)
@@ -90,99 +90,114 @@ bool Player::isCollisionBlock(CaseTypes& type)
     return false;
 }
 
-PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk)
+PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, GameAudio& sounds)
 {
     PlayerUpdate update;
 
-     sf::Vector2f lpos = this->playerPos;
+    sf::Vector2f lpos = this->playerPos;
 
-     sf::Vector2f roundPlayer = sf::Vector2f(round(this->playerPos.x), round(this->playerPos.y));
-     CaseTypes type = getCaseByPosition(chunk->chunk, roundPlayer)->case_type;
+    sf::Vector2f roundPlayer = sf::Vector2f(round(this->playerPos.x), round(this->playerPos.y));
+    CaseTypes type = getCaseByPosition(chunk->chunk, roundPlayer)->case_type;
 
 
-     sf::Vector2f pO = sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50);
-     std::vector<int> eraselist;
+    sf::Vector2f pO = sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50);
+    std::vector<int> eraselist;
+    if (night)
+    {
+        for (unsigned int i = 0; i < chunk->listEnemies.size(); i++)
+        {
+            if (isPlayerAround(pO, chunk->listEnemies[i]->position, 50) && (this->activeState != PlayerStates::S_DEFEND_L && this->activeState != PlayerStates::S_DEFEND_R))
+            {
+                if (this->activeState == PlayerStates::S_ATTACK_L || this->activeState == PlayerStates::S_ATTACK_R)
+                {
+                    enemiesDmgTime += deltatime;
+                    if (damageTime > this->damage)
+                    {
+                        enemiesDmgTime = 0.0f;
+                        chunk->listEnemies[i]->life -= 1;
+                        if (chunk->listEnemies[i]->life < 0)
+                        {
+                            sf::SoundBuffer soundBuffer;
+                            if (sounds.getSound(ENEMY, &soundBuffer))
+                            {
+                                sf::Sound sound(soundBuffer);
+                                sound.play();
+                            }
 
-     for (unsigned int i=0;i < chunk->listEnemies.size();i++)
-     {
-         if (isPlayerAround(pO, chunk->listEnemies[i]->position, 50) && (this->activeState != PlayerStates::S_DEFEND_L && this->activeState != PlayerStates::S_DEFEND_R))
-         {
-             if (this->activeState == PlayerStates::S_ATTACK_L || this->activeState == PlayerStates::S_ATTACK_R)
-             {
-                 enemiesDmgTime += deltatime;
-                 if (damageTime > this->damage)
-                 {
-                     enemiesDmgTime = 0.0f;
-                     chunk->listEnemies[i]->life -= 1;
-                     if (chunk->listEnemies[i]->life < 0)
-                     {
-                         this->kill++;
-                         std::vector<Item*> items = chunk->listEnemies[i]->DropItems();
-                         chunk->listItems.insert(chunk->listItems.end(), items.begin(), items.end());
-                         eraselist.push_back(i);
-                     }
-                 }
-             }
+                            this->kill++;
+                            this->xp += chunk->listEnemies[i]->xpBack;
+                            std::vector<Item*> items = chunk->listEnemies[i]->DropItems();
+                            chunk->listItems.insert(chunk->listItems.end(), items.begin(), items.end());
+                            eraselist.push_back(i);
+                        }
+                    }
+                }
 
-             damageTime += deltatime;
-             if (damageTime > chunk->listEnemies[i]->damage)
-             {
-                 damageTime = 0.0f;
-                 this->life -= 1;
-             }
-             update.hasUpdate = true;
-         }
-     }
+                damageTime += deltatime;
+                if (damageTime > chunk->listEnemies[i]->damage)
+                {
+                    damageTime = 0.0f;
+                    this->life -= 1;
+                    if (this->life <= 0)
+                    {
+                        update.isDead = true;
+                        LOG() << "[player die]";
+                    }
+                }
+                update.hasUpdate = true;
+            }
+        }
 
-     if (eraselist.size() != 0)
-     {
-         update.hasChunkUpdate = true;
-         
-         for (size_t i = 0; i < eraselist.size(); i++)
-         {
-             chunk->listEnemies.erase(chunk->listEnemies.begin() + eraselist[i] - i);
-         }
+        if (eraselist.size() != 0)
+        {
+            update.hasChunkUpdate = true;
 
-         update.chunkUpdate = chunk;
-         eraselist.clear();
-     }
+            for (size_t i = 0; i < eraselist.size(); i++)
+            {
+                chunk->listEnemies.erase(chunk->listEnemies.begin() + eraselist[i] - i);
+            }
 
-     if (type != CaseTypes::NONE)
-     {
-         switch (type)
-         {
-         case WATER:
-             this->activeState = S_WATER;
-             break;
-         default:
-         {
-             if (isDirectionR)
-             {
-                 this->activeState = STATIC_R;
-             }
-             else
-             {
-                 this->activeState = STATIC_L;
-             }
-         }
-         break;
-         }
-     }
+            update.chunkUpdate = chunk;
+            eraselist.clear();
+        }
+    }
 
-     if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
-     {
-         rCTRLpressTime += deltatime;
-         if (rCTRLpressTime >= 0.15)
-         {
-             this->HUDbarIndex++;
-             if (this->HUDbarIndex > 7)
-             {
-                 this->HUDbarIndex = 0;
-             }
-             update.hasUpdate = true;
-             rCTRLpressTime = 0.0f;
-         }
-     }
+    if (type != CaseTypes::NONE)
+    {
+        switch (type)
+        {
+        case WATER:
+            this->activeState = S_WATER;
+            break;
+        default:
+        {
+            if (isDirectionR)
+            {
+                this->activeState = STATIC_R;
+            }
+            else
+            {
+                this->activeState = STATIC_L;
+            }
+        }
+        break;
+        }
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+    {
+        rCTRLpressTime += deltatime;
+        if (rCTRLpressTime >= 0.15)
+        {
+            this->HUDbarIndex++;
+            if (this->HUDbarIndex > 7)
+            {
+                this->HUDbarIndex = 0;
+            }
+            update.hasUpdate = true;
+            rCTRLpressTime = 0.0f;
+        }
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
     {
@@ -203,11 +218,12 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk)
             if (isDirectionR)
             {
                 this->activeState = S_ATTACK_L;
-            }else
+            }
+            else
             {
                 this->activeState = S_ATTACK_R;
             }
-           
+
             playerSeep = this->Max_player_speed - 2;
         }
 
@@ -265,7 +281,7 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk)
     {
         this->lastPos = lpos;
     }
-   
+
     return update;
 }
 
@@ -298,7 +314,7 @@ Chunk* Player::getChunk(std::vector<Chunk*>& chunks,sf::Vector2f position)
     return chunk;
 }
 
-bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& activeChunk)
+bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& activeChunk, GameAudio& sounds)
 {
     this->isNew = false;
     bool chunkChange = false;
@@ -400,6 +416,7 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
         LOG() << "[chunk change] (" << activeChunk->position.x << ";" << activeChunk->position.y << ")";
         if (std::find(visitedChunks.begin(), visitedChunks.end(), activeChunk->position) == visitedChunks.end())
         {
+            this->xp += 5;
             this->isNew = true;
             this->visitedChunks.push_back(activeChunk->position);
         }

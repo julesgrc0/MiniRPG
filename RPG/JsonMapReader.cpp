@@ -228,6 +228,32 @@ void JsonMapReader::setupTextures()
         this->setupTexture(this->map["textures"], "player", this->players_textures);
         this->setupTexture(this->map["textures"], "items", this->items_textures);
     }
+
+    if (this->map["sounds"])
+    {
+        LOG() << "[info] Loading sounds";
+        this->setupSounds(this->map["sounds"]);
+    }
+}
+
+void JsonMapReader::setupSounds(Json::Value audio)
+{
+    int size = audio.size();
+    int i = 0;
+    for (Json::Value sound : audio)
+    {
+        if (sound["id"] && sound["value"])
+        {
+            sf::SoundBuffer buff;
+            if (buff.loadFromFile(sound["value"].asString()))
+            {
+                std::pair<int, sf::SoundBuffer> s = { sound["id"].asInt(),buff };
+                this->sounds.push_back(s);
+            }           
+        }
+        i++;
+        LOG() << "[sound] " << i << "/" << size;
+    }
 }
 
 JsonMapReader::~JsonMapReader()

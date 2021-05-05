@@ -73,6 +73,13 @@
             }
         ]
     },
+    "sounds":
+    [
+        {
+            "id":0,
+            "value":"C:/Users/jules/Downloads/michelbaradari-monsters/monster/paind.wav"
+        }
+    ],
     "map": [
         {
             "coord": {

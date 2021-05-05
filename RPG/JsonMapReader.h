@@ -2,6 +2,7 @@
 #include<iostream>
 #include<json/json.h>
 #include<SFML/Graphics.hpp>
+#include<SFML/Audio.hpp>
 #include "Case.h"
 #include "Chunk.h"
 
@@ -19,12 +20,14 @@ public:
 	std::vector<std::pair<int, sf::Texture*>> enemies_textures;
 	std::vector<std::pair<int, sf::Texture*>> items_textures;
 	std::vector<std::pair<int, sf::Texture*>> players_textures;
+	std::vector<std::pair<int, sf::SoundBuffer>> sounds;
 
 	bool isTexturesLoad = false;
 private:
 	Chunk* LoadJsonChunk(Json::Value&, sf::Vector2f);
 	void setupTextures();
 	void setupTexture(Json::Value texture, std::string type, std::vector<std::pair<int, sf::Texture*>>&);
+	void setupSounds(Json::Value audio);
 	bool isset(std::vector<Chunk*>&,int, int);
 	
 	Json::Value map;

@@ -60,7 +60,7 @@ ChunkUpdate Chunk::Update(float deltatime, PlayerObject& player,std::vector<Case
 {
     this->isNight = player.isNight;
     ChunkUpdate update;
-
+    
     if (this->listEnemies.size() != 0 && this->isNight)
     {
         for (Enemy* p : this->listEnemies)

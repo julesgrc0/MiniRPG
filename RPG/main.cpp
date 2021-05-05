@@ -6,8 +6,21 @@
 
 int main(int argc, const char *argv[])
 {
-	MainGame mainGame = MainGame();
-	mainGame.Run();
+	HWND console = GetForegroundWindow();
+#ifndef _DEBUG
+	ShowWindow(console, SW_HIDE);
+#else 
+	ShowWindow(console, SW_SHOW);
+#endif
+
+	while (true)
+	{
+		MainGame mainGame = MainGame();
+		if (!mainGame.Run())
+		{
+			break;
+		}
+	}
 
 	// _CrtDumpMemoryLeaks();
 	return 0;

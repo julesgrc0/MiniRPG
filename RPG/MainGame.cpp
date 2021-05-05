@@ -6,6 +6,7 @@
 #include <Windows.h>
 
 #include "MainGame.h"
+#include "GameAudio.h"
 #include "Log.h"
 #include "Utils.h"
 
@@ -36,9 +37,9 @@ MainGame::~MainGame()
 }
 
 
-void MainGame::Run()
+int MainGame::Run()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 500), "", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(800, 500), "Cube", sf::Style::Close);
 
     window.setVerticalSyncEnabled(false);
     window.setFramerateLimit(0);
@@ -46,7 +47,8 @@ void MainGame::Run()
     bool chunkChange = false;
     bool endAnimation = false;
     bool mapReady = false;
-
+    bool gameGlobalUpdate = false;
+    bool restart = false;
 
     float chunkChangeAnimation = chunkAnimationDuration;
     float deltatime = 0;
@@ -66,6 +68,7 @@ void MainGame::Run()
     ChunkUpdate chunkUpdate;
     PlayerUpdate playerUpdate;
     GameTexture textures = GameTexture();
+    GameAudio sounds = GameAudio();
     HUD hud = HUD(this->font);
 
     this->player.playerPos = sf::Vector2f(4, 4);
@@ -99,6 +102,8 @@ void MainGame::Run()
                 textures.items_textures = reader.items_textures;
 
                 textures.players_textures = reader.players_textures;
+
+                sounds.sounds = reader.sounds;
             }
             mapReady = true;
             chunkChangeAnimation = 0.0f;
@@ -130,23 +135,48 @@ void MainGame::Run()
                     }
                 }
 
-                if (HasError)
+                if (HasError || playerUpdate.isDead)
                 {
-                    if (this->isFontReady)
+                    if (playerUpdate.isDead)
                     {
                         window.clear();
-                        sf::Text errorText;
-                        errorText.setFont(font);
-                        errorText.setString(errorValue);
-                        errorText.setCharacterSize(14);
-                        errorText.setPosition(sf::Vector2f(10, 10));
-                        errorText.setFillColor(sf::Color::Red);
-                        window.draw(errorText);
+                        sf::Text dead;
+                        dead.setFont(font);
+                        dead.setCharacterSize(20);
+
+                        dead.setString("Vous êtes mort... Appuyer sur [SPACE] pour recommencer ou [ESCAPE] pour quitter.");
+                        
+                        dead.setPosition(sf::Vector2f(20, (500 / 2) - 20));
+                        dead.setFillColor(sf::Color::Red);
+
+                        window.draw(dead);
                         window.display();
-                    }
-                    else
+
+                        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+                        {
+                            restart = true;
+                            window.close();
+                        }
+                    }else
                     {
-                        window.setTitle(errorValue);
+                        LOG() << "[game error] " << errorValue;
+                        
+                        if (this->isFontReady)
+                        {
+                            window.clear();
+                            sf::Text errorText;
+                            errorText.setFont(font);
+                            errorText.setString(errorValue);
+                            errorText.setCharacterSize(14);
+                            errorText.setPosition(sf::Vector2f(10, 10));
+                            errorText.setFillColor(sf::Color::Red);
+                            window.draw(errorText);
+                            window.display();
+                        }
+                        else
+                        {
+                            window.setTitle(errorValue);
+                        }
                     }
                 }
                 else
@@ -158,8 +188,10 @@ void MainGame::Run()
                     current = time(0);
                     if (current - start >= (time_t)1)
                     {
+                    #ifdef _DEBUG
                         window.setTitle(std::to_string(frames));
-
+                    #endif
+                        gameGlobalUpdate = true;
                         frames = 0;
                         start = time(0);
                     }
@@ -202,6 +234,7 @@ void MainGame::Run()
                                 {
                                     if (it.second == activeChunk->listItems[i]->position)
                                     {
+                                        this->player.xp++;
                                         removelist.push_back(i);
                                         break;
                                     }
@@ -227,7 +260,7 @@ void MainGame::Run()
                             chunkUpdate.ItemsCollect.clear();
                         }
                         
-                        playerUpdate = this->player.KeyBoardUpdate(deltatime, activeChunk);
+                        playerUpdate = this->player.KeyBoardUpdate(deltatime, activeChunk,this->isNight,sounds);
                         
                         if (playerUpdate.hasChunkUpdate)
                         {
@@ -250,7 +283,7 @@ void MainGame::Run()
                                 this->player.goForward();
                             }
 
-                            chunkChange = this->player.MapUpdate(deltatime, map, activeChunk);
+                            chunkChange = this->player.MapUpdate(deltatime, map, activeChunk,sounds);
                         }
 
                         mouseUpdate = this->mouse.Update(window);
@@ -337,9 +370,9 @@ void MainGame::Run()
                     }
                     else
                     {
-                        if (playerUpdate.hasUpdate || mouseUpdate.hasMove || endAnimation || chunkUpdate.EnemyUpdate || chunkUpdate.ItemUpdate)
+                        if (playerUpdate.hasUpdate || mouseUpdate.hasMove || endAnimation || chunkUpdate.EnemyUpdate || chunkUpdate.ItemUpdate || gameGlobalUpdate)
                         {
-
+                            gameGlobalUpdate = false;
                             gameTexture.clear();
 
                             activeChunk->Draw(gameTexture, textures);
@@ -395,17 +428,23 @@ void MainGame::Run()
 
             delete activeChunk;
             map.clear();
+
+            if (restart)
+            {
+                return 1;
+            }
+
+            return 0;
 }
 
 void MainGame::DrawNightFilter(sf::RenderTexture& gameTexture, sf::Vector2u size, int gameTime)
 {
 
-    int gradien = 120 - (int)((120 * gameTime * (100 / this->gameTimeSwitch)) / 100);
-    if (!this->isNight)
+    int gradien = (120 * gameTime)/this->gameTimeSwitch;
+    if (this->isNight)
     {
-        gradien = (int)((120 * gameTime * (100 / this->gameTimeSwitch)) / 100);
+        gradien = 120 - gradien;
     }
-
     sf::RectangleShape filter;
     filter.setFillColor(sf::Color(0, 0, 90, gradien));
     filter.setPosition(sf::Vector2f(0, 0));

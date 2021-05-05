@@ -19,6 +19,7 @@ public:
 	std::vector<Item*> DropItems();
 
 	int life = 100;
+	int xpBack = 10;
 	float damage = 0.5;
 private:
 	int actualDist = 0;

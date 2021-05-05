@@ -142,6 +142,7 @@
     <ClCompile Include="Case.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="GameAudio.cpp" />
     <ClCompile Include="GameTexture.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Case.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="GameAudio.h" />
     <ClInclude Include="GameTexture.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Item.h" />

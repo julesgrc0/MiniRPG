@@ -3,11 +3,13 @@
 #include"JsonMapReader.h"
 #include "GameTexture.h"
 #include "Utils.h"
+#include "GameAudio.h"
 
 struct PlayerUpdate
 {
 	bool hasUpdate = false;
 	bool hasChunkUpdate = false;
+	bool isDead = false;
 	Chunk* chunkUpdate;
 };
 
@@ -17,8 +19,8 @@ public:
 	Player();
 	~Player();
 	
-	PlayerUpdate KeyBoardUpdate(float deltatime, Chunk*& chunk);
-	bool MapUpdate(float deltatime,std::vector<Chunk*>&, Chunk*& activeChunk);
+	PlayerUpdate KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, GameAudio&);
+	bool MapUpdate(float deltatime,std::vector<Chunk*>&, Chunk*& activeChunk, GameAudio&);
 	bool isNewChunk();
 	void addVisitedChunk(sf::Vector2f);
 
