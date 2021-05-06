@@ -8,7 +8,7 @@
 class MainGame
 {
 public:
-	MainGame();
+	MainGame(char*&);
 	~MainGame();
 	int Run();
 

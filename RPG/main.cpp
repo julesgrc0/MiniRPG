@@ -6,6 +6,16 @@
 
 int main(int argc, const char *argv[])
 {
+	char* mapName;
+	if (argc > 1)
+	{
+		mapName = (char*)argv[1];
+	}
+	else 
+	{
+		mapName = (char*)"map.json";
+	}
+
 	HWND console = GetForegroundWindow();
 #ifndef _DEBUG
 	ShowWindow(console, SW_HIDE);
@@ -15,7 +25,7 @@ int main(int argc, const char *argv[])
 
 	while (true)
 	{
-		MainGame mainGame = MainGame();
+		MainGame mainGame = MainGame(mapName);
 		if (!mainGame.Run())
 		{
 			break;

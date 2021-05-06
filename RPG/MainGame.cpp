@@ -11,12 +11,12 @@
 #include "Utils.h"
 
 
-MainGame::MainGame()
+MainGame::MainGame(char*& mapName)
 {
     char* EXE_FOLDER = new char[MAX_PATH];
     GetModuleFileNameA(NULL, EXE_FOLDER, std::ios::binary);
     std::string pfont = std::string(EXE_FOLDER) + "\\assets\\Fonts\\Arial\\arial.ttf";
-    std::string pmap = std::string(EXE_FOLDER) + "\\assets\\Maps\\map.json";
+    std::string pmap = std::string(EXE_FOLDER) + "\\assets\\Maps\\" + std::string(mapName);
     delete[] EXE_FOLDER;
 
     if (this->font.loadFromFile(pfont))
@@ -159,8 +159,6 @@ int MainGame::Run()
                         }
                     }else
                     {
-                        LOG() << "[game error] " << errorValue;
-                        
                         if (this->isFontReady)
                         {
                             window.clear();
