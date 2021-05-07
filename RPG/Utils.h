@@ -90,7 +90,7 @@ static std::vector<std::string> split(const std::string& txt, char ch)
 }
 
 
-static bool isTypeEnemy(EnemiTypes* enemy, EnemiTypes& type,int size)
+static bool isTypeEnemy( EnemiTypes* enemy, EnemiTypes& type,int size)
 {
     for (size_t i = 0; i < size; i++)
     {

@@ -3,7 +3,6 @@
 #include <Windows.h>
 #include "MainGame.h"
 
-
 int main(int argc, const char *argv[])
 {
 	char* mapName;
@@ -23,6 +22,7 @@ int main(int argc, const char *argv[])
 	ShowWindow(console, SW_SHOW);
 #endif
 
+	
 	while (true)
 	{
 		MainGame mainGame = MainGame(mapName);

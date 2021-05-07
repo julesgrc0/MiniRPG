@@ -4,16 +4,16 @@
 
 struct HUDupdateObject
 {
-	sf::Vector2f chunkPos;
-	sf::Vector2f playerPos;
-	int enemiesCount;
-	int inventoryItemsCount;
+	sf::Vector2f chunkPos = sf::Vector2f(0,0);
+	sf::Vector2f playerPos = sf::Vector2f(0,0);
+	int enemiesCount = 0;
+	int inventoryItemsCount = 0;
 	ItemTypes activeBar[8];
-	int activeBarIndex;
-	int playerLife;
-	int playerXP;
-	int playerKill;
-	float deltatime;
+	int activeBarIndex = 0;
+	int playerLife = 0;
+	int playerXP = 0;
+	int playerKill = 0;
+	float deltatime = 0.0f;
 	int night;
 };
 
