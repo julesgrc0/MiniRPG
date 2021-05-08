@@ -9,7 +9,7 @@ Player::Player()
         this->activeBar[i] = ITEM_NONE;
     }
 }
-void Player::Draw(sf::RenderWindow& window, GameTexture& textures)
+void Player::Draw(sf::RenderWindow &window, GameTexture &textures)
 {
     sf::CircleShape circ;
     circ.setFillColor(sf::Color::Black);
@@ -18,15 +18,16 @@ void Player::Draw(sf::RenderWindow& window, GameTexture& textures)
     window.draw(circ);
 }
 
-void Player::Draw(sf::RenderTexture& texture, GameTexture& textures)
+void Player::Draw(sf::RenderTexture &texture, GameTexture &textures)
 {
-    sf::Texture* textureItem = new sf::Texture();
-    if (this->getTexture(this->activeState, textures,textureItem))
+    sf::Texture *textureItem = new sf::Texture();
+    if (this->getTexture(this->activeState, textures, textureItem))
     {
         sf::Sprite sprite = sf::Sprite(*textureItem);
         sprite.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50));
         texture.draw(sprite);
-    }else
+    }
+    else
     {
         sf::CircleShape circ;
         circ.setFillColor(sf::Color::Black);
@@ -37,7 +38,7 @@ void Player::Draw(sf::RenderTexture& texture, GameTexture& textures)
 
     sf::RectangleShape lifeRect;
     lifeRect.setSize(sf::Vector2f(50, 8));
-    lifeRect.setPosition(sf::Vector2f(this->playerPos.x*50, this->playerPos.y * 50 -  10));
+    lifeRect.setPosition(sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50 - 10));
     lifeRect.setOutlineColor(sf::Color::Black);
     lifeRect.setOutlineThickness(1.0f);
     lifeRect.setFillColor(sf::Color::Transparent);
@@ -50,9 +51,9 @@ void Player::Draw(sf::RenderTexture& texture, GameTexture& textures)
     texture.draw(lifeFill);
 }
 
-bool Player::getTexture(PlayerStates state, GameTexture& textures,sf::Texture*& textureItem)
+bool Player::getTexture(PlayerStates state, GameTexture &textures, sf::Texture *&textureItem)
 {
-    for (std::pair<int, sf::Texture*> p : textures.players_textures)
+    for (std::pair<int, sf::Texture *> p : textures.players_textures)
     {
         if (p.first == (int)state)
         {
@@ -77,7 +78,7 @@ void Player::goForward()
     this->playerPos = this->lastPos;
 }
 
-bool Player::isCollisionBlock(CaseTypes& type)
+bool Player::isCollisionBlock(CaseTypes &type)
 {
     for (CaseTypes Itemtype : this->collisions)
     {
@@ -90,7 +91,7 @@ bool Player::isCollisionBlock(CaseTypes& type)
     return false;
 }
 
-PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, GameAudio& sounds)
+PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk *&chunk, bool night, GameAudio &sounds)
 {
     PlayerUpdate update;
 
@@ -98,7 +99,6 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, 
 
     sf::Vector2f roundPlayer = sf::Vector2f(round(this->playerPos.x), round(this->playerPos.y));
     CaseTypes type = getCaseByPosition(chunk->chunk, roundPlayer)->case_type;
-
 
     sf::Vector2f pO = sf::Vector2f(this->playerPos.x * 50, this->playerPos.y * 50);
     std::vector<int> eraselist;
@@ -126,7 +126,7 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, 
 
                             this->kill++;
                             this->xp += chunk->listEnemies[i]->xpBack;
-                            std::vector<Item*> items = chunk->listEnemies[i]->DropItems();
+                            std::vector<Item *> items = chunk->listEnemies[i]->DropItems();
                             chunk->listItems.insert(chunk->listItems.end(), items.begin(), items.end());
                             eraselist.push_back(i);
                         }
@@ -276,7 +276,6 @@ PlayerUpdate Player::KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, 
         }
     }
 
-
     if (update.hasUpdate)
     {
         this->lastPos = lpos;
@@ -298,10 +297,10 @@ bool Player::isNewChunk()
     }
 }
 
-Chunk* Player::getChunk(std::vector<Chunk*>& chunks,sf::Vector2f position)
+Chunk *Player::getChunk(std::vector<Chunk *> &chunks, sf::Vector2f position)
 {
-    Chunk* chunk = new Chunk();
-    for (Chunk* c : chunks)
+    Chunk *chunk = new Chunk();
+    for (Chunk *c : chunks)
     {
         if (c->position == position)
         {
@@ -314,7 +313,7 @@ Chunk* Player::getChunk(std::vector<Chunk*>& chunks,sf::Vector2f position)
     return chunk;
 }
 
-bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& activeChunk, GameAudio& sounds)
+bool Player::MapUpdate(float deltatime, std::vector<Chunk *> &chunks, Chunk *&activeChunk, GameAudio &sounds)
 {
     this->isNew = false;
     bool chunkChange = false;
@@ -329,7 +328,7 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.x++;
-        Chunk* c = this->getChunk(chunks, next);
+        Chunk *c = this->getChunk(chunks, next);
         if (c->chunk.size() > 0)
         {
             this->playerPos.x -= 9.5;
@@ -350,7 +349,7 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.x--;
-        Chunk* c = this->getChunk(chunks, next);
+        Chunk *c = this->getChunk(chunks, next);
         if (c->chunk.size() > 0)
         {
             this->playerPos.x += 9.5;
@@ -367,12 +366,12 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
             this->playerPos.x += playerSeep * deltatime;
         }
     }
-    
+
     if (roundPlayer.y > max_out_detection)
     {
         next = activeChunk->position;
         next.y++;
-        Chunk* c = this->getChunk(chunks, next);
+        Chunk *c = this->getChunk(chunks, next);
         if (c->chunk.size() > 0)
         {
             this->playerPos.y -= 9.5;
@@ -393,7 +392,7 @@ bool Player::MapUpdate(float deltatime, std::vector<Chunk*>& chunks, Chunk*& act
     {
         next = activeChunk->position;
         next.y--;
-        Chunk* c = this->getChunk(chunks, next);
+        Chunk *c = this->getChunk(chunks, next);
         if (c->chunk.size() > 0)
         {
             this->playerPos.y += 9.5;

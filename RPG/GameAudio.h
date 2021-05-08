@@ -1,7 +1,6 @@
 #pragma once
-#include<SFML/Audio.hpp>
-#include<iostream>
-
+#include <SFML/Audio.hpp>
+#include <iostream>
 
 enum SoundTypes
 {
@@ -14,8 +13,6 @@ class GameAudio
 public:
 	GameAudio();
 	~GameAudio();
-	bool getSound(int, sf::SoundBuffer*);
+	bool getSound(int, sf::SoundBuffer *);
 	std::vector<std::pair<int, sf::SoundBuffer>> sounds;
-
 };
-

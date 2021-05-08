@@ -1,14 +1,12 @@
 #include "GameAudio.h"
 
-
 GameAudio::GameAudio()
 {
-
 }
 
-bool GameAudio::getSound(int id, sf::SoundBuffer* out)
+bool GameAudio::getSound(int id, sf::SoundBuffer *out)
 {
-	for (std::pair<int, sf::SoundBuffer>& s : this->sounds)
+	for (std::pair<int, sf::SoundBuffer> &s : this->sounds)
 	{
 		if (s.first == id)
 		{

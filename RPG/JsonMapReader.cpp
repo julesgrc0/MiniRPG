@@ -1,19 +1,18 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include <stdio.h>
 #include "JsonMapReader.h"
-#include<thread>
+#include <thread>
 #include "Item.h"
 #include "Log.h"
 #include "Utils.h"
 
 JsonMapReader::JsonMapReader()
 {
-
 }
 
-bool JsonMapReader::isset(std::vector<Chunk*>& chunks,int x, int y)
+bool JsonMapReader::isset(std::vector<Chunk *> &chunks, int x, int y)
 {
-    for (Chunk* chunk : chunks)
+    for (Chunk *chunk : chunks)
     {
         if (chunk->position.x == x && chunk->position.y == y)
         {
@@ -23,9 +22,9 @@ bool JsonMapReader::isset(std::vector<Chunk*>& chunks,int x, int y)
     return false;
 }
 
-std::vector<Chunk*> JsonMapReader::getMap()
+std::vector<Chunk *> JsonMapReader::getMap()
 {
-    std::vector<Chunk*> map;
+    std::vector<Chunk *> map;
     int i = 0;
     int size = this->map["map"].size();
 
@@ -50,7 +49,6 @@ std::vector<Chunk*> JsonMapReader::getMap()
                     map.push_back(this->LoadJsonChunk(jsonChunk, sf::Vector2f(x, y)));
                 }
             }
-
         }
         LOG() << "[chunk] " << i << "/" << size;
     }
@@ -58,9 +56,9 @@ std::vector<Chunk*> JsonMapReader::getMap()
     return map;
 }
 
-Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
+Chunk *JsonMapReader::LoadJsonChunk(Json::Value &jsonChunk, sf::Vector2f postion)
 {
-    Chunk* chunk = new Chunk();
+    Chunk *chunk = new Chunk();
     chunk->position = postion;
 
     for (Json::Value jsonEn : jsonChunk["enemies"])
@@ -71,7 +69,7 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
             {
                 if (type == jsonEn["type"].asInt())
                 {
-                    Enemy* enemy = new Enemy();
+                    Enemy *enemy = new Enemy();
                     enemy->type = type;
                     enemy->position = sf::Vector2f(jsonEn["coord"]["x"].asInt() * 50, jsonEn["coord"]["y"].asInt() * 50);
                     chunk->listEnemies.push_back(enemy);
@@ -88,7 +86,7 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
             {
                 if (type == jsonIt["type"].asInt())
                 {
-                    Item* item = new Item();
+                    Item *item = new Item();
                     item->position = sf::Vector2f(jsonIt["coord"]["x"].asInt() * 50, jsonIt["coord"]["y"].asInt() * 50);
                     item->type = type;
                     chunk->listItems.push_back(item);
@@ -99,7 +97,7 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
 
     for (Json::Value jsonBlock : jsonChunk["chunk"])
     {
-        Case* block = new Case(50);
+        Case *block = new Case(50);
 
         for (CaseTypes type = CaseTypes::GRASS; type != CaseTypes::NONE; type = (CaseTypes)((int)type + 1))
         {
@@ -115,9 +113,9 @@ Chunk* JsonMapReader::LoadJsonChunk(Json::Value& jsonChunk,sf::Vector2f postion)
     return chunk;
 }
 
-std::vector<Case*> JsonMapReader::getChunk(sf::Vector2f position)
+std::vector<Case *> JsonMapReader::getChunk(sf::Vector2f position)
 {
-    std::vector<Case*> cases;
+    std::vector<Case *> cases;
     for (Json::Value jsonChunk : this->map["map"])
     {
         if (jsonChunk["chunk"] && jsonChunk["coord"] && jsonChunk["coord"]["x"] && jsonChunk["coord"]["y"])
@@ -136,7 +134,7 @@ std::vector<Case*> JsonMapReader::getChunk(sf::Vector2f position)
 
 bool JsonMapReader::loadMap(std::string path)
 {
-   FILE* file = fopen(path.c_str(), "r");
+    FILE *file = fopen(path.c_str(), "r");
     char c;
     std::string content;
 
@@ -161,14 +159,14 @@ bool JsonMapReader::loadMap(std::string path)
         std::thread([&] {
             setupTextures();
             isTexturesLoad = true;
-            }).detach();
+        }).detach();
         return true;
     }
 
     return false;
 }
 
-void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vector<std::pair<int, sf::Texture*>>& listTextures)
+void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vector<std::pair<int, sf::Texture *>> &listTextures)
 {
     if (this->map["textures"][type])
     {
@@ -186,7 +184,7 @@ void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vec
                         image.flipVertically();
                     }
 
-                    sf::Texture* block = new sf::Texture();
+                    sf::Texture *block = new sf::Texture();
 
                     if (image.getSize().x > 50 || image.getSize().y > 50)
                     {
@@ -196,7 +194,7 @@ void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vec
 
                         if (block->loadFromImage(newImage))
                         {
-                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
+                            std::pair<int, sf::Texture *> p = {texture["id"].asInt(), block};
                             listTextures.push_back(p);
                         }
                     }
@@ -204,7 +202,7 @@ void JsonMapReader::setupTexture(Json::Value texture, std::string type, std::vec
                     {
                         if (block->loadFromImage(image))
                         {
-                            std::pair<int, sf::Texture*> p = { texture["id"].asInt(),block };
+                            std::pair<int, sf::Texture *> p = {texture["id"].asInt(), block};
                             listTextures.push_back(p);
                         }
                     }
@@ -222,7 +220,7 @@ void JsonMapReader::setupTextures()
     if (this->map["textures"])
     {
         LOG() << "[info] Loading textures";
-        
+
         this->setupTexture(this->map["textures"], "block", this->block_textures);
         this->setupTexture(this->map["textures"], "enemies", this->enemies_textures);
         this->setupTexture(this->map["textures"], "player", this->players_textures);
@@ -247,9 +245,9 @@ void JsonMapReader::setupSounds(Json::Value audio)
             sf::SoundBuffer buff;
             if (buff.loadFromFile(sound["value"].asString()))
             {
-                std::pair<int, sf::SoundBuffer> s = { sound["id"].asInt(),buff };
+                std::pair<int, sf::SoundBuffer> s = {sound["id"].asInt(), buff};
                 this->sounds.push_back(s);
-            }           
+            }
         }
         i++;
         LOG() << "[sound] " << i << "/" << size;

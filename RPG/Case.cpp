@@ -5,7 +5,7 @@
 
 Case::Case(int size)
 {
-	this->texture.create(size,size);
+	this->texture.create(size, size);
 }
 
 Case::~Case()
@@ -16,7 +16,7 @@ void Case::Update(float deltatime)
 {
 }
 
-sf::Sprite Case::Draw(sf::Vector2f pos, GameTexture& textures)
+sf::Sprite Case::Draw(sf::Vector2f pos, GameTexture &textures)
 {
 	bool hasTexture = false;
 	if (textures.block_textures.size() != 0)
@@ -41,9 +41,9 @@ sf::Sprite Case::Draw(sf::Vector2f pos, GameTexture& textures)
 	return sprite;
 }
 
-bool Case::SetTexture(GameTexture& textures,int id)
+bool Case::SetTexture(GameTexture &textures, int id)
 {
-	sf::Texture* img = new sf::Texture();
+	sf::Texture *img = new sf::Texture();
 	if (getTexture(textures.block_textures, id, img))
 	{
 		this->texture.clear();

@@ -1,12 +1,12 @@
 #include "HUD.h"
 #include "Log.h"
 
-HUD::HUD(sf::Font& f)
+HUD::HUD(sf::Font &f)
 {
 	this->font = f;
 }
 
-void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures)
+void HUD::Draw(sf::RenderWindow &window, sf::Sprite &game, GameTexture &textures)
 {
 	int topMargin = 1;
 	game.setPosition(sf::Vector2f(500 + topMargin, topMargin));
@@ -33,13 +33,13 @@ void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures
 	itemRect.setOutlineThickness(2.0f);
 
 	sf::Sprite spriteItem;
-	sf::Texture* textureItem = new sf::Texture();
+	sf::Texture *textureItem = new sf::Texture();
 	bool hasTexture = false;
 
 	for (size_t i = 0; i < 8; i++)
 	{
 		hasTexture = false;
-		
+
 		if (getTexture(textures.items_textures, (int)this->active.activeBar[i], textureItem))
 		{
 			hasTexture = true;
@@ -49,14 +49,15 @@ void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures
 		if (i == this->active.activeBarIndex)
 		{
 			itemRect.setFillColor(sf::Color::Color(111, 111, 111, 255));
-		}else
+		}
+		else
 		{
 			itemRect.setFillColor(sf::Color::Color(77, 77, 77, 255));
 		}
 
 		if (i > 3)
 		{
-			itemRect.setPosition(sf::Vector2f(500 + (i - 4) * 75 + topMargin*2, 100 + topMargin * 6 + 50));
+			itemRect.setPosition(sf::Vector2f(500 + (i - 4) * 75 + topMargin * 2, 100 + topMargin * 6 + 50));
 			window.draw(itemRect);
 			if (hasTexture)
 			{
@@ -66,18 +67,18 @@ void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures
 		}
 		else
 		{
-			itemRect.setPosition(sf::Vector2f(500 + i * 75 + topMargin*2, 100 + topMargin * 3));
+			itemRect.setPosition(sf::Vector2f(500 + i * 75 + topMargin * 2, 100 + topMargin * 3));
 			window.draw(itemRect);
 			if (hasTexture)
 			{
-				spriteItem.setPosition(sf::Vector2f(500 + i * 75 + 25/2, 100 + topMargin * 3));
+				spriteItem.setPosition(sf::Vector2f(500 + i * 75 + 25 / 2, 100 + topMargin * 3));
 				window.draw(spriteItem);
 			}
 		}
 	}
 
 	sf::RectangleShape statsRect;
-	statsRect.setSize(sf::Vector2f(300,500 - (200 + topMargin * 4)));
+	statsRect.setSize(sf::Vector2f(300, 500 - (200 + topMargin * 4)));
 	statsRect.setPosition(sf::Vector2f(500, 200 + topMargin * 4));
 	statsRect.setFillColor(sf::Color::Color(49, 49, 49, 255));
 	window.draw(statsRect);
@@ -87,7 +88,7 @@ void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures
 	sf::Text t;
 	t.setFont(this->font);
 	t.setCharacterSize(14);
-	
+
 	t.setPosition(textPos);
 	t.setString("frames time: " + std::to_string(this->active.deltatime) + "ms");
 	window.draw(t);
@@ -109,12 +110,12 @@ void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures
 
 	textPos.y += 20;
 	t.setPosition(textPos);
-	t.setString("x: " + std::to_string(this->active.playerPos.x) + " y:"+ std::to_string(this->active.playerPos.y));
+	t.setString("x: " + std::to_string(this->active.playerPos.x) + " y:" + std::to_string(this->active.playerPos.y));
 	window.draw(t);
 
 	textPos.y += 20;
 	t.setPosition(textPos);
-	t.setString("inventory: " +std::to_string(this->active.inventoryItemsCount));
+	t.setString("inventory: " + std::to_string(this->active.inventoryItemsCount));
 	window.draw(t);
 
 	textPos.y += 20;
@@ -128,12 +129,11 @@ void HUD::Draw(sf::RenderWindow& window, sf::Sprite& game, GameTexture& textures
 	window.draw(t);
 }
 
-void HUD::Update(HUDupdateObject& update)
+void HUD::Update(HUDupdateObject &update)
 {
 	this->active = update;
 }
 
 HUD::~HUD()
 {
-
 }

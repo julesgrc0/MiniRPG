@@ -5,24 +5,23 @@
 
 int main(int argc, const char *argv[])
 {
-	char* mapName;
+	char *mapName;
 	if (argc > 1)
 	{
-		mapName = (char*)argv[1];
+		mapName = (char *)argv[1];
 	}
-	else 
+	else
 	{
-		mapName = (char*)"map.json";
+		mapName = (char *)"map.json";
 	}
 
 	HWND console = GetForegroundWindow();
 #ifndef _DEBUG
 	ShowWindow(console, SW_HIDE);
-#else 
+#else
 	ShowWindow(console, SW_SHOW);
 #endif
 
-	
 	while (true)
 	{
 		MainGame mainGame = MainGame(mapName);

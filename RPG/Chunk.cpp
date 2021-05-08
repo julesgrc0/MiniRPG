@@ -7,7 +7,7 @@ Chunk::Chunk()
     this->chunkTime = 0.0f;
 }
 
-void Chunk::Draw(sf::RenderWindow& window, GameTexture& textures)
+void Chunk::Draw(sf::RenderWindow &window, GameTexture &textures)
 {
     for (int i = 0; i < 100; i += 10)
     {
@@ -18,7 +18,7 @@ void Chunk::Draw(sf::RenderWindow& window, GameTexture& textures)
     }
 }
 
-Chunk& Chunk::operator = (const Chunk*& chunk)
+Chunk &Chunk::operator=(const Chunk *&chunk)
 {
     this->size = chunk->size;
     this->listEnemies = chunk->listEnemies;
@@ -30,7 +30,7 @@ Chunk& Chunk::operator = (const Chunk*& chunk)
     return *this;
 }
 
-void Chunk::Draw(sf::RenderTexture& texture, GameTexture& textures)
+void Chunk::Draw(sf::RenderTexture &texture, GameTexture &textures)
 {
     for (int i = 0; i < 100; i += 10)
     {
@@ -42,7 +42,7 @@ void Chunk::Draw(sf::RenderTexture& texture, GameTexture& textures)
 
     if (this->listEnemies.size() != 0 && this->isNight)
     {
-        for (Enemy* p : this->listEnemies)
+        for (Enemy *p : this->listEnemies)
         {
             p->Draw(texture, textures);
         }
@@ -50,23 +50,23 @@ void Chunk::Draw(sf::RenderTexture& texture, GameTexture& textures)
 
     if (this->listItems.size() != 0)
     {
-        for (Item* it : this->listItems)
+        for (Item *it : this->listItems)
         {
             it->Draw(texture, textures);
         }
     }
 }
 
-ChunkUpdate Chunk::Update(float deltatime, PlayerObject& player,std::vector<Case*>& cases)
+ChunkUpdate Chunk::Update(float deltatime, PlayerObject &player, std::vector<Case *> &cases)
 {
     this->isNight = player.isNight;
     ChunkUpdate update;
-    
+
     if (this->listEnemies.size() != 0 && this->isNight)
     {
-        for (Enemy* p : this->listEnemies)
+        for (Enemy *p : this->listEnemies)
         {
-            if(p->Update(deltatime, player, cases).hasUpdate)
+            if (p->Update(deltatime, player, cases).hasUpdate)
             {
                 update.EnemyUpdate = true;
             }
@@ -75,12 +75,12 @@ ChunkUpdate Chunk::Update(float deltatime, PlayerObject& player,std::vector<Case
 
     if (this->listItems.size() != 0)
     {
-        for (Item* it : this->listItems)
+        for (Item *it : this->listItems)
         {
             if (it->Update(deltatime, player).hasUpdate)
             {
                 update.ItemUpdate = true;
-                std::pair<ItemTypes, sf::Vector2f> col = { it->type,it->position };
+                std::pair<ItemTypes, sf::Vector2f> col = {it->type, it->position};
                 update.ItemsCollect.push_back(col);
             }
         }
@@ -88,8 +88,6 @@ ChunkUpdate Chunk::Update(float deltatime, PlayerObject& player,std::vector<Case
 
     return update;
 }
-
-
 
 Chunk::~Chunk()
 {

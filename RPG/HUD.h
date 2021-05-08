@@ -1,11 +1,11 @@
 #pragma once
-#include<SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include "Utils.h"
 
 struct HUDupdateObject
 {
-	sf::Vector2f chunkPos = sf::Vector2f(0,0);
-	sf::Vector2f playerPos = sf::Vector2f(0,0);
+	sf::Vector2f chunkPos = sf::Vector2f(0, 0);
+	sf::Vector2f playerPos = sf::Vector2f(0, 0);
 	int enemiesCount = 0;
 	int inventoryItemsCount = 0;
 	ItemTypes activeBar[8];
@@ -20,13 +20,13 @@ struct HUDupdateObject
 class HUD
 {
 public:
-	HUD(sf::Font&);
+	HUD(sf::Font &);
 	~HUD();
 
-	void Draw(sf::RenderWindow&,sf::Sprite&,GameTexture&);
-	void Update(HUDupdateObject&);
+	void Draw(sf::RenderWindow &, sf::Sprite &, GameTexture &);
+	void Update(HUDupdateObject &);
+
 private:
 	HUDupdateObject active;
 	sf::Font font;
 };
-

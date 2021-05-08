@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include"JsonMapReader.h"
+#include "JsonMapReader.h"
 #include "GameTexture.h"
 #include "Utils.h"
 #include "GameAudio.h"
@@ -10,7 +10,7 @@ struct PlayerUpdate
 	bool hasUpdate = false;
 	bool hasChunkUpdate = false;
 	bool isDead = false;
-	Chunk* chunkUpdate;
+	Chunk *chunkUpdate;
 };
 
 class Player
@@ -18,16 +18,16 @@ class Player
 public:
 	Player();
 	~Player();
-	
-	PlayerUpdate KeyBoardUpdate(float deltatime, Chunk*& chunk, bool night, GameAudio&);
-	bool MapUpdate(float deltatime,std::vector<Chunk*>&, Chunk*& activeChunk, GameAudio&);
+
+	PlayerUpdate KeyBoardUpdate(float deltatime, Chunk *&chunk, bool night, GameAudio &);
+	bool MapUpdate(float deltatime, std::vector<Chunk *> &, Chunk *&activeChunk, GameAudio &);
 	bool isNewChunk();
 	void addVisitedChunk(sf::Vector2f);
 
-	void Draw(sf::RenderWindow &,GameTexture&);
-	void Draw(sf::RenderTexture &,GameTexture&);
+	void Draw(sf::RenderWindow &, GameTexture &);
+	void Draw(sf::RenderTexture &, GameTexture &);
 
-	bool isCollisionBlock(CaseTypes&);
+	bool isCollisionBlock(CaseTypes &);
 	void goForward();
 
 	sf::Vector2f playerPos;
@@ -41,8 +41,9 @@ public:
 
 	PlayerStates activeState = STATIC_L;
 
-	std::vector<Item*> inventory;
+	std::vector<Item *> inventory;
 	ItemTypes activeBar[8];
+
 private:
 	const CaseTypes collisions[8] = {
 		CASTLE_WALL_L,
@@ -54,10 +55,10 @@ private:
 		CASTLE_WALL_ANGLE_R,
 		CASTLE_WALL_ANGLE_B,
 	};
-	
+
 	sf::Vector2f lastPos;
 
-	bool getTexture(PlayerStates, GameTexture&, sf::Texture*&);
+	bool getTexture(PlayerStates, GameTexture &, sf::Texture *&);
 
 	bool isNew = false;
 	const int Max_player_speed = 5;
@@ -69,5 +70,5 @@ private:
 	const int damage = 0.3;
 
 	std::vector<sf::Vector2f> visitedChunks;
-	Chunk* getChunk(std::vector<Chunk*>& ,sf::Vector2f);
+	Chunk *getChunk(std::vector<Chunk *> &, sf::Vector2f);
 };

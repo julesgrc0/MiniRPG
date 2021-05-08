@@ -1,7 +1,5 @@
 #include "Mouse.h"
 
-
-
 Mouse::Mouse()
 {
 }
@@ -23,7 +21,6 @@ MouseUpdate Mouse::Update(sf::RenderWindow &window)
     {
         update.isOnMap = false;
     }
-
 
     if (last_m_pos.x != this->m_pos.x || last_m_pos.y != this->m_pos.y)
     {
@@ -66,5 +63,4 @@ void Mouse::Draw(sf::RenderTexture &texture)
 
 Mouse::~Mouse()
 {
- 
 }

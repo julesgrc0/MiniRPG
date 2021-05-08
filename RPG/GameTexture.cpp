@@ -1,9 +1,7 @@
 #include "GameTexture.h"
 
-
 GameTexture::GameTexture()
 {
-
 }
 
 GameTexture::~GameTexture()
